@@ -11,6 +11,7 @@ class GameView extends StatefulWidget {
 class _GameViewState extends State<GameView> {
 
   final itemsNumber = 6*6;
+  final dict = "qwertyuiopasdfghjklzxcvbnmqwertyuiopa";
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +28,7 @@ class _GameViewState extends State<GameView> {
             return LetterBox(
               isSelected: selected,
               id: index,
+              letter: dict[index],
             );
           }
       ),

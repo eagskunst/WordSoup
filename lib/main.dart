@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:word_soup/ui/custom/letter_box.dart';
-import 'package:word_soup/ui/custom/letters_grid_view.dart';
 import 'package:word_soup/ui/game_view.dart';
 
 void main() => runApp(MyApp());
