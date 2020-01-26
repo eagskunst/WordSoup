@@ -53,7 +53,7 @@ class _LetterBoxState extends State<LetterBox> with TickerProviderStateMixin {
         width: FULL_WIDTH,
         height: FULL_HEIGHT,
         duration: Duration(milliseconds: 150),
-        margin: EdgeInsets.only(left: 5),
+        margin: EdgeInsets.only(left: 5, top: 5, right: 5),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
             color: widget.isSelected ? Colors.indigo : Colors.white,
