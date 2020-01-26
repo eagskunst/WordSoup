@@ -39,6 +39,14 @@ class _MyHomePageState extends State<MyHomePage> {
   final itemsNumber = 6;
 
   @override
+  void initState() {
+    super.initState();
+    /*final WordsBloc wordsBloc = BlocProvider.of(context);
+    wordsBloc.generateWords(itemsNumber);*/
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     final WordsBloc wordsBloc = BlocProvider.of(context);
     wordsBloc.generateWords(itemsNumber);
@@ -46,8 +54,23 @@ class _MyHomePageState extends State<MyHomePage> {
       body: StreamBuilder<String>(
         stream: wordsBloc.wordsStream,
         builder: (context, snapshot) {
+          print("Is null or data is empty: ${snapshot.data == null || snapshot.data.isEmpty}");
           if(snapshot.data == null || snapshot.data.isEmpty)
-            return CircularProgressIndicator();
+            return Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    CircularProgressIndicator(),
+                    Container(
+                        margin: EdgeInsets.only(top: 10),
+                        child: Text('Cargando')
+                    )
+                  ],
+                )
+            );
           else
             return GameView(sentence: snapshot.data);
         }

@@ -19,23 +19,24 @@ class WordsBloc implements Bloc{
   Stream<String> get wordsStream => createWordsController.stream;
   StreamSink<String> get wordsSink => createWordsController.sink;
 
-  void _restartBoard(int tableSize){
+  void restartBoard(final int tableSize){
     generating = true;
     addedWords.clear();
     filledIndexes.clear();
     wordsDirections.clear();
+    wordsSink.add(null);
     this.tableSize = tableSize;
   }
 
-  void generateWords(int tableSize) async{
+  Future<void> generateWords(final int tableSize) async{
     if(generating) return;
-    _restartBoard(tableSize);
+    restartBoard(tableSize);
     final random = Random();
-    for(var i = 0; i < 2; i++){ /*i < tableSize*/
-      final direction = WordDirection.Vertical;/*_getWordDirection(random);*/
+    for(var i = 0; i < 4; i++){ /*i < tableSize*/
+      final direction = i%2 == 0 ? WordDirection.Horizontal : WordDirection.Vertical;/*_getWordDirection(random);*/
       final backwards = random.nextInt(2) == 1;
-      final word = _generateRandomWord();
-      final initialPosition = _generateInitialPosition(
+      final word = await _generateRandomWord(backwards, direction);
+      final initialPosition = await _generateInitialPosition(
           word: word,
           backwards: backwards,
           direction: direction
@@ -74,14 +75,13 @@ class WordsBloc implements Bloc{
       }
     }
     wordsSink.add(buffer.toString());
-    print("Words added: $addedWords");
     generating = false;
   }
 
-  int _calculateAmountOfDirection(WordDirection direction) =>
+  int _calculateAmountOfDirection(final WordDirection direction) =>
       wordsDirections.fold(0, (acc, dir) => dir == direction ? acc++ : acc);
 
-  WordDirection _getWordDirection(Random random){
+  Future<WordDirection> _getWordDirection(final Random random){
     int amountHor = _calculateAmountOfDirection(WordDirection.Horizontal);
     int amountVer = _calculateAmountOfDirection(WordDirection.Vertical);
     int amountDiag = _calculateAmountOfDirection(WordDirection.Diagonal);
@@ -92,53 +92,77 @@ class WordsBloc implements Bloc{
         case 0:
           if(amountHor != tableSize / 2) {
             keepLooking = false;
-            return WordDirection.Horizontal;
+            return Future.value(WordDirection.Horizontal);
           }
           break;
         case 1:
           if(amountVer != tableSize / 2) {
             keepLooking = false;
-            return WordDirection.Vertical;
+            return Future.value(WordDirection.Vertical);
           }
           break;
         case 2:
           if(amountDiag != tableSize / 2) {
             keepLooking = false;
-            return WordDirection.Diagonal;
+            return Future.value(WordDirection.Diagonal);
           }
           break;
       }
     }
-    return WordDirection.Horizontal;
+    return Future.value(WordDirection.Horizontal);
   }
 
-  String _generateRandomWord(){
+  Future<String> _generateRandomWord(final bool backwards, final WordDirection direction){
     var keepLooking = true;
+    var word = "";
     while(keepLooking){
-      final word = WordPair.random().first;
+      word = WordPair.random().first;
       if(!addedWords.contains(word) && word.length <= tableSize){
-        keepLooking = false;
-        return word;
+        for(var i = 0; i < tableSize * tableSize; i++){
+          keepLooking = _checkIfCanAddWord(
+            word: word, backwards: backwards, direction: direction, position: i
+          );
+          if(!keepLooking){
+            String to;
+            if(direction == WordDirection.Horizontal){
+              to = "${i+word.length}";
+            }
+            else{
+              to = "${ i + ( (word.length - 1) * tableSize)}";
+            }
+            print("The word $word can be added from:$i to:$to");
+            break;
+          }
+        }
       }
     }
-    return "";
+    return Future.value(word);
   }
 
-  bool _checkIfCanAddWord({String word, bool backwards, int position, WordDirection direction}){
+  bool _checkIfCanAddWord({final String word, final bool backwards, final int position, final WordDirection direction}){
     var keepLooking = false;
     var mutablePos = position;
     switch(direction){
 
       case WordDirection.Horizontal:
-        for(var i = 0; i<word.length;i++){
-          if(filledIndexes.containsKey(mutablePos) && filledIndexes[mutablePos] != word[i])
+
+        for(var i = 0; i<word.length && !keepLooking;i++){
+          final canAdd = backwards ? mutablePos >= 0 : mutablePos < (tableSize * tableSize);
+          if( (filledIndexes.containsKey(mutablePos) && filledIndexes[mutablePos] != word[i]))
+            keepLooking = true;
+          else if(!canAdd)
+            keepLooking = true;
+          else if(exceedRow(mutablePos, position))
             keepLooking = true;
           backwards ? mutablePos-- : mutablePos++;
         }
         break;
       case WordDirection.Vertical:
-        for(var i = 0; i<word.length;i++){
+        for(var i = 0; i<word.length && !keepLooking;i++){
+          final canAdd = backwards ? mutablePos >= 0 :mutablePos < (tableSize * tableSize);
           if(filledIndexes.containsKey(mutablePos) && filledIndexes[mutablePos] != word[i])
+            keepLooking = true;
+          else if(!canAdd)
             keepLooking = true;
           backwards ? mutablePos-=tableSize : mutablePos+=tableSize;
         }
@@ -151,15 +175,28 @@ class WordsBloc implements Bloc{
     return keepLooking;
   }
 
-  int _generateInitialPosition({String word, bool backwards, WordDirection direction}){
+  int _getMaxPosForRow(final int position){
+    final currentRow = position ~/ tableSize;
+    return (currentRow * tableSize) + tableSize - 1;
+  }
+
+  int _getMinPosForRow(final int position){
+    final currentRow = position ~/ tableSize;
+    return currentRow * tableSize;
+  }
+
+  bool exceedRow(final int currentPos,final int originalPos) => currentPos > _getMaxPosForRow(originalPos) || currentPos < _getMinPosForRow(originalPos);
+
+  Future<int> _generateInitialPosition({final String word, final bool backwards, final WordDirection direction}){
     final rand = Random();
+
     switch(direction){
       case WordDirection.Horizontal: {
         if(word.length == tableSize){
           var keepLooking = true;
           int pos = -1;
           while(keepLooking){
-            pos = backwards ? ( (rand.nextInt(tableSize) * tableSize) + tableSize - 1 ) : rand.nextInt(tableSize) * tableSize;
+            pos = rand.nextInt(2) == 1 ? ( (rand.nextInt(tableSize) * tableSize) + tableSize - 1 ) : rand.nextInt(tableSize) * tableSize;
             keepLooking = _checkIfCanAddWord(
               word: word,
               backwards: backwards,
@@ -167,22 +204,18 @@ class WordsBloc implements Bloc{
               direction: direction
             );
           }
-          return pos;
+          return Future.value(pos);
         }
         else {
           final limitStarts = (tableSize - word.length) + 1;
           final possiblePositions = List<int>();
 
           for(var i = 0; i < tableSize;i++) {
-            if(backwards){
-              for(var j = word.length - (limitStarts - 1); j < tableSize; j++){
-                possiblePositions.add( (tableSize * i) + j);
-              }
+            for(var j = word.length - (limitStarts - 1); j < tableSize; j++){
+              possiblePositions.add( (tableSize * i) + j);
             }
-            else{
-              for(var j = limitStarts - 1; j>=0; j--){
-                possiblePositions.add( (tableSize * i) + j);
-              }
+            for(var j = limitStarts - 1; j>=0; j--){
+              possiblePositions.add( (tableSize * i) + j);
             }
           }
 
@@ -190,6 +223,7 @@ class WordsBloc implements Bloc{
           int pos = -1;
           while(keepLooking){
             pos = possiblePositions.elementAt(rand.nextInt(possiblePositions.length));
+            possiblePositions.remove(pos);
             keepLooking = _checkIfCanAddWord(
               word: word,
               backwards: backwards,
@@ -197,7 +231,7 @@ class WordsBloc implements Bloc{
               direction: direction
             );
           }
-          return pos;
+          return Future.value(pos);
         }
         break;
       }
@@ -206,7 +240,7 @@ class WordsBloc implements Bloc{
           var keepLooking = true;
           int pos = -1;
           while(keepLooking){
-            pos = backwards ? ( rand.nextInt(tableSize) + (tableSize * (tableSize - 1)) ) : rand.nextInt(tableSize);
+            pos = rand.nextInt(2) == 1 ? ( rand.nextInt(tableSize) + (tableSize * (tableSize - 1)) ) : rand.nextInt(tableSize);
             keepLooking = _checkIfCanAddWord(
               word: word,
               backwards: backwards,
@@ -214,22 +248,18 @@ class WordsBloc implements Bloc{
               direction: direction
             );
           }
-          return pos;
+          return Future.value(pos);
         }
         else {
           final limitStarts = (tableSize - word.length) + 1;
           final possiblePositions = List<int>();
 
           for(var i = 0; i < limitStarts;i++) {
-            if(backwards){
-              for(var j = ( tableSize * (tableSize - i) ) - 1; j >= ( tableSize * (tableSize - i - 1) ); j--){
-                possiblePositions.add(j);
-              }
+            for(var j = ( tableSize * (tableSize - i) ) - 1; j >= ( tableSize * (tableSize - i - 1) ); j--){
+              possiblePositions.add(j);
             }
-            else{
-              for(var j = tableSize * i; j < (tableSize * (i + 1) ) - 1; j++){
-                possiblePositions.add(j);
-              }
+            for(var j = tableSize * i; j < (tableSize * (i + 1) ); j++){
+              possiblePositions.add(j);
             }
           }
 
@@ -237,6 +267,7 @@ class WordsBloc implements Bloc{
           int pos = -1;
           while(keepLooking){
             pos = possiblePositions.elementAt(rand.nextInt(possiblePositions.length));
+            possiblePositions.remove(pos);
             keepLooking = _checkIfCanAddWord(
                 word: word,
                 backwards: backwards,
@@ -244,7 +275,7 @@ class WordsBloc implements Bloc{
                 direction: direction
             );
           }
-          return pos;
+          return Future.value(pos);
         }
         break;
       }
@@ -254,7 +285,7 @@ class WordsBloc implements Bloc{
       }
     }
 
-    return -1;
+    return Future.value(-1);
   }
 
   @override
