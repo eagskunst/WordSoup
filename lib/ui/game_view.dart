@@ -32,7 +32,7 @@ class _GameViewState extends State<GameView> {
           onSelectionChanged: (selection) => setState((){
             print("ENTER SELECTION CHANGE");
             final buffer = StringBuffer();
-            selection.forEach( (ind) => buffer.write(widget.sentence[ind]));
+            selection.forEach( (ind) => ind != -1 ? buffer.write(widget.sentence[ind]) : {});
             if(wordsBloc.addedWords.contains(buffer.toString())){
               print("Word finded: ${buffer.toString()}");
             }

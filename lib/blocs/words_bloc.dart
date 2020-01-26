@@ -19,42 +19,46 @@ class WordsBloc implements Bloc{
   Stream<String> get wordsStream => createWordsController.stream;
   StreamSink<String> get wordsSink => createWordsController.sink;
 
+  void _restartBoard(int tableSize){
+    generating = true;
+    addedWords.clear();
+    filledIndexes.clear();
+    wordsDirections.clear();
+    this.tableSize = tableSize;
+  }
+
   void generateWords(int tableSize) async{
     if(generating) return;
-    generating = true;
-    this.tableSize = tableSize;
-
+    _restartBoard(tableSize);
     final random = Random();
     for(var i = 0; i < 2; i++){ /*i < tableSize*/
-      final direction = WordDirection.Horizontal;/*_getWordDirection(random);*/
+      final direction = WordDirection.Vertical;/*_getWordDirection(random);*/
+      final backwards = random.nextInt(2) == 1;
+      final word = _generateRandomWord();
+      final initialPosition = _generateInitialPosition(
+          word: word,
+          backwards: backwards,
+          direction: direction
+      );
+      var changingPos = initialPosition;
 
       switch(direction){
         case WordDirection.Horizontal: {
-          final backwards = random.nextInt(2) == 1;
-          final word = _generateRandomWord();
-          final initialPosition = _generateInitialPosition(
-            word: word,
-            backwards: backwards,
-            direction: WordDirection.Horizontal
-          );
-          var changingPos = initialPosition;
-          if(backwards){
-            for(var i = word.length - 1; i>=0; i--){
-              filledIndexes[changingPos] = word[i];
-              changingPos--;
-            }
-          }
-          else{
-            for(var i = 0; i < word.length; i++){
-              filledIndexes[changingPos] = word[i];
-              changingPos++;
-            }
+          for(var i = 0; i < word.length; i++){
+            filledIndexes[changingPos] = word[i];
+            backwards ? changingPos -- : changingPos++;
           }
           addedWords.add(word);
           wordsDirections.add(WordDirection.Horizontal);
           break;
         }
         case WordDirection.Vertical:
+          for(var i = 0; i < word.length; i++){
+            filledIndexes[changingPos] = word[i];
+            backwards ? changingPos -=tableSize : changingPos+=tableSize;
+          }
+          addedWords.add(word);
+          wordsDirections.add(WordDirection.Horizontal);
           break;
         case WordDirection.Diagonal:
           break;
@@ -70,6 +74,7 @@ class WordsBloc implements Bloc{
       }
     }
     wordsSink.add(buffer.toString());
+    print("Words added: $addedWords");
     generating = false;
   }
 
@@ -119,21 +124,30 @@ class WordsBloc implements Bloc{
     return "";
   }
 
-  bool _checkIfCanAddWord({String word, bool backwards, int position}){
+  bool _checkIfCanAddWord({String word, bool backwards, int position, WordDirection direction}){
     var keepLooking = false;
     var mutablePos = position;
-    if(backwards){
-      for(var i = word.length - 1; i>=0;i--, mutablePos--){
-        if(filledIndexes.containsKey(mutablePos) && filledIndexes[mutablePos] != word[i])
-          keepLooking = true;
-      }
+    switch(direction){
+
+      case WordDirection.Horizontal:
+        for(var i = 0; i<word.length;i++){
+          if(filledIndexes.containsKey(mutablePos) && filledIndexes[mutablePos] != word[i])
+            keepLooking = true;
+          backwards ? mutablePos-- : mutablePos++;
+        }
+        break;
+      case WordDirection.Vertical:
+        for(var i = 0; i<word.length;i++){
+          if(filledIndexes.containsKey(mutablePos) && filledIndexes[mutablePos] != word[i])
+            keepLooking = true;
+          backwards ? mutablePos-=tableSize : mutablePos+=tableSize;
+        }
+        break;
+      case WordDirection.Diagonal:
+        // TODO: Handle this case.
+        break;
     }
-    else{
-      for(var i = 0; i<word.length;i++, mutablePos++){
-        if(filledIndexes.containsKey(mutablePos) && filledIndexes[mutablePos] != word[i])
-          keepLooking = true;
-      }
-    }
+
     return keepLooking;
   }
 
@@ -145,11 +159,12 @@ class WordsBloc implements Bloc{
           var keepLooking = true;
           int pos = -1;
           while(keepLooking){
-            final pos = backwards ? ( (rand.nextInt(tableSize) * tableSize) + tableSize) - 1 : rand.nextInt(tableSize) * tableSize;
+            pos = backwards ? ( (rand.nextInt(tableSize) * tableSize) + tableSize - 1 ) : rand.nextInt(tableSize) * tableSize;
             keepLooking = _checkIfCanAddWord(
               word: word,
               backwards: backwards,
-              position: pos
+              position: pos,
+              direction: direction
             );
           }
           return pos;
@@ -176,9 +191,10 @@ class WordsBloc implements Bloc{
           while(keepLooking){
             pos = possiblePositions.elementAt(rand.nextInt(possiblePositions.length));
             keepLooking = _checkIfCanAddWord(
-                word: word,
-                backwards: backwards,
-                position: pos
+              word: word,
+              backwards: backwards,
+              position: pos,
+              direction: direction
             );
           }
           return pos;
@@ -186,7 +202,50 @@ class WordsBloc implements Bloc{
         break;
       }
       case WordDirection.Vertical:{
+        if(word.length == tableSize){
+          var keepLooking = true;
+          int pos = -1;
+          while(keepLooking){
+            pos = backwards ? ( rand.nextInt(tableSize) + (tableSize * (tableSize - 1)) ) : rand.nextInt(tableSize);
+            keepLooking = _checkIfCanAddWord(
+              word: word,
+              backwards: backwards,
+              position: pos,
+              direction: direction
+            );
+          }
+          return pos;
+        }
+        else {
+          final limitStarts = (tableSize - word.length) + 1;
+          final possiblePositions = List<int>();
 
+          for(var i = 0; i < limitStarts;i++) {
+            if(backwards){
+              for(var j = ( tableSize * (tableSize - i) ) - 1; j >= ( tableSize * (tableSize - i - 1) ); j--){
+                possiblePositions.add(j);
+              }
+            }
+            else{
+              for(var j = tableSize * i; j < (tableSize * (i + 1) ) - 1; j++){
+                possiblePositions.add(j);
+              }
+            }
+          }
+
+          var keepLooking = true;
+          int pos = -1;
+          while(keepLooking){
+            pos = possiblePositions.elementAt(rand.nextInt(possiblePositions.length));
+            keepLooking = _checkIfCanAddWord(
+                word: word,
+                backwards: backwards,
+                position: pos,
+                direction: direction
+            );
+          }
+          return pos;
+        }
         break;
       }
       case WordDirection.Diagonal:{
