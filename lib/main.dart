@@ -5,14 +5,7 @@ import 'package:word_soup/blocs/words_bloc.dart';
 import 'package:word_soup/ui/game_view.dart';
 
 
-void main() => runApp(
-    BlocProvider(
-        creator: (_context, _bag) {
-          WordsBloc();
-        },
-        child: MyApp()
-    )
-);
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
@@ -23,7 +16,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: BlocProvider<WordsBloc>(
+          creator: (_context, bag) => WordsBloc(),
+          child: MyHomePage(title: 'Flutter Demo Home Page')
+      ),
     );
   }
 }
@@ -44,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final wordsBloc = WordsBloc();
+    final WordsBloc wordsBloc = BlocProvider.of(context);
     wordsBloc.generateWords(itemsNumber);
     return Scaffold(
       body: StreamBuilder<String>(

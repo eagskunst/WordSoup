@@ -1,4 +1,6 @@
+import 'package:bloc_provider/bloc_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:word_soup/blocs/words_bloc.dart';
 
 import 'custom/letter_box.dart';
 import 'custom/letters_grid_view.dart';
@@ -19,13 +21,22 @@ class _GameViewState extends State<GameView> {
 
   @override
   Widget build(BuildContext context) {
+    final WordsBloc wordsBloc = BlocProvider.of(context);
+
     print("Sentence: ${widget.sentence}");
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
       margin: EdgeInsets.all(20),
       child: LettersGridView(
-          onSelectionChanged: (selection) => setState(() => {}),
+          onSelectionChanged: (selection) => setState((){
+            print("ENTER SELECTION CHANGE");
+            final buffer = StringBuffer();
+            selection.forEach( (ind) => buffer.write(widget.sentence[ind]));
+            if(wordsBloc.addedWords.contains(buffer.toString())){
+              print("Word finded: ${buffer.toString()}");
+            }
+          }),
           itemCount: tableSize * tableSize,
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 50,

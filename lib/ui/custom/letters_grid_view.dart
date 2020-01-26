@@ -7,6 +7,7 @@ typedef OnSelectionChange = void Function(List<int> selection);
 
 class LettersGridView extends StatefulWidget {
 
+  //TODO: Pass finded words index as parameter
   const LettersGridView({
     Key key,
     this.onSelectionChanged,
@@ -66,7 +67,7 @@ class LettersGridViewState extends State<LettersGridView> {
     indexList.clear();
     indexList.add(startIndex);
     _moreThanTwo = false;
-    _setSelection(startIndex,);
+    _setSelection(startIndex);
     setState(() => _isSelecting = (startIndex != -1));
   }
 
@@ -79,6 +80,9 @@ class LettersGridViewState extends State<LettersGridView> {
   void _onLongPressEnd(LongPressEndDetails details) {
     _updateEndIndex(details.localPosition);
     setState(() => _isSelecting = false);
+    if (widget.onSelectionChanged != null) {
+      widget.onSelectionChanged?.call(indexList);
+    }
   }
 
   void _updateEndIndex(Offset localPosition) {
@@ -129,9 +133,6 @@ class LettersGridViewState extends State<LettersGridView> {
     setState(() {
       _startIndex = start;
     });
-    if (widget.onSelectionChanged != null) {
-      widget.onSelectionChanged?.call(indexList);
-    }
   }
 
   int _findMultiSelectChildFromOffset(Offset offset) {
