@@ -32,8 +32,8 @@ class WordsBloc implements Bloc{
     if(generating) return;
     restartBoard(tableSize);
     final random = Random();
-    for(var i = 0; i < 4; i++){ /*i < tableSize*/
-      final direction = i%2 == 0 ? WordDirection.Horizontal : WordDirection.Vertical;/*_getWordDirection(random);*/
+    for(var i = 0; i < tableSize; i++){ /*i < tableSize*/
+      final direction = await _getWordDirection(random);
       final backwards = random.nextInt(2) == 1;
       final word = await _generateRandomWord(backwards, direction);
       final initialPosition = await _generateInitialPosition(
@@ -49,8 +49,6 @@ class WordsBloc implements Bloc{
             filledIndexes[changingPos] = word[i];
             backwards ? changingPos -- : changingPos++;
           }
-          addedWords.add(word);
-          wordsDirections.add(WordDirection.Horizontal);
           break;
         }
         case WordDirection.Vertical:
@@ -58,22 +56,28 @@ class WordsBloc implements Bloc{
             filledIndexes[changingPos] = word[i];
             backwards ? changingPos -=tableSize : changingPos+=tableSize;
           }
-          addedWords.add(word);
-          wordsDirections.add(WordDirection.Horizontal);
           break;
         case WordDirection.Diagonal:
+          for(var i = 0; i < word.length; i++){
+            filledIndexes[changingPos] = word[i];
+            changingPos = backwards ? (changingPos - tableSize) - 1 :  (changingPos - tableSize) + 1;
+          }
           break;
       }
+
+      addedWords.add(word.toUpperCase());
+      wordsDirections.add(direction);
     }
     final buffer = StringBuffer();
     for(var i = 0;i<tableSize * tableSize;i++){
       if(filledIndexes[i] != null){
-        buffer.write(filledIndexes[i]);
+        buffer.write(filledIndexes[i].toUpperCase());
       }
       else{
         buffer.write(WordPair.random().first[0]);
       }
     }
+    print("Words in soup: $addedWords");
     wordsSink.add(buffer.toString());
     generating = false;
   }
@@ -127,7 +131,7 @@ class WordsBloc implements Bloc{
             if(direction == WordDirection.Horizontal){
               to = "${i+word.length}";
             }
-            else{
+            else if(direction == WordDirection.Vertical){
               to = "${ i + ( (word.length - 1) * tableSize)}";
             }
             print("The word $word can be added from:$i to:$to");
@@ -168,7 +172,11 @@ class WordsBloc implements Bloc{
         }
         break;
       case WordDirection.Diagonal:
-        // TODO: Handle this case.
+        for(var i = 0; i<word.length && !keepLooking;i++){
+          if(filledIndexes.containsKey(mutablePos) && filledIndexes[mutablePos] != word[i])
+            keepLooking = true;
+          mutablePos = backwards ? (mutablePos - tableSize) - 1 :  (mutablePos - tableSize) + 1;
+        }
         break;
     }
 
@@ -279,13 +287,68 @@ class WordsBloc implements Bloc{
         }
         break;
       }
-      case WordDirection.Diagonal:{
+      case WordDirection.Diagonal: {
+        final possiblePositionsBackwards = [(tableSize * tableSize) - 1];
+        final possiblePositionsForwards = [(tableSize * (tableSize - 1))];
+        final offsetColumns = List<int>();
+        for(var i = 0; i < tableSize; i++){
+          offsetColumns.add(i * tableSize);
+          offsetColumns.add( (i * tableSize) + tableSize - 1);
+        }
 
+        if(word.length != tableSize){
+          //Create positions going backwards:
+          for(var i = tableSize * tableSize - 1;i>=0;i--){ //Can be optimized looking for max row to use based on word length
+            final filteredList =  offsetColumns.where( (i) => i%tableSize == 0).toList(growable: false);
+            final result = finalPositionFromBackwards(i, 1, word.length, filteredList);
+            if(result < tableSize * tableSize && result >= 0)
+              possiblePositionsBackwards.add(i);
+          }
+          for(var i = 0;i < tableSize * tableSize;i++){ //Can be optimized looking for max row to use based on word length
+            final filteredList = offsetColumns.where( (i) => i%tableSize != 0).toList(growable: false);
+            final result = finalPositionFromForward(i, 1, word.length, filteredList);
+            if(result < tableSize * tableSize && result >= 0)
+              possiblePositionsForwards.add(i);
+          }
+        }
+        final listToUse = backwards ? possiblePositionsBackwards : possiblePositionsForwards;
+        while(listToUse.isNotEmpty){
+          int posToCheck;
+          posToCheck = listToUse.elementAt(rand.nextInt(listToUse.length));
+          listToUse.remove(posToCheck);
+
+          final keepLooking = _checkIfCanAddWord(
+            word: word, backwards: backwards, position: posToCheck, direction: direction
+          );
+          if(!keepLooking) {
+            return Future.value(posToCheck);
+          }
+        }
         break;
       }
     }
 
     return Future.value(-1);
+  }
+
+  int finalPositionFromBackwards(final position, final int acc, final int wordLength, final List<int> offsetColumns){
+    if(acc == wordLength)
+      return position;
+    else if(offsetColumns.contains(position))
+      return -1;
+    else
+      return finalPositionFromBackwards((position - tableSize) - 1, acc+1, wordLength, offsetColumns);
+  }
+
+  int finalPositionFromForward(final position, final int acc, final int wordLength, final List<int> offsetColumns){
+    if(position == 34)
+      print("Debug");
+    if(acc == wordLength)
+      return position;
+    else if(offsetColumns.contains(position))
+      return tableSize * tableSize + 1;
+    else
+      return finalPositionFromForward((position - tableSize) + 1, acc+1, wordLength, offsetColumns);
   }
 
   @override
