@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:word_soup/utils/multi_select_child.dart';
-import 'package:word_soup/utils/multi_select_child_element.dart';
+import 'package:word_soup/utils/widgets/multi_select_child.dart';
+import 'package:word_soup/utils/widgets/multi_select_child_element.dart';
 
 typedef LettersGridViewBuilder = Widget Function(BuildContext context, int index, bool isSelected);
 typedef OnSelectionChange = void Function(List<int> selection);

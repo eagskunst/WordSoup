@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:word_soup/ui/custom/letters_grid_view.dart';
-import 'package:word_soup/utils/multi_select_child.dart';
+import 'package:word_soup/ui/widgets/letters_grid_view.dart';
+import 'package:word_soup/utils/widgets/multi_select_child.dart';
 
 class MultiSelectChildElement extends ProxyElement {
   MultiSelectChildElement(MultiSelectChild widget) : super(widget);

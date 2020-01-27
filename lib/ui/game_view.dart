@@ -1,9 +1,8 @@
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:word_soup/blocs/words_bloc.dart';
-
-import 'custom/letter_box.dart';
-import 'custom/letters_grid_view.dart';
+import 'package:word_soup/ui/widgets/letter_box.dart';
+import 'package:word_soup/ui/widgets/letters_grid_view.dart';
 
 class GameView extends StatefulWidget {
 
