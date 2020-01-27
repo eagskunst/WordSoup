@@ -7,8 +7,7 @@ class BoardData {
   const BoardData(this.maxCrossAxisExtent, this.wordsNumber, [this.mainAxisSpacing = 5, this.crossAxisSpacing = 5]);
 
   static const BOARD_MAP = {
-    6: BoardData(50, 6, 8, 10),
-    7: BoardData(45, 6),
+    7: BoardData(75, 6, 5, 10),
     8: BoardData(35, 8),
     9: BoardData(32, 10),
     10: BoardData(30, 12),

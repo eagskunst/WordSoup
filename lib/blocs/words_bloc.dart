@@ -21,18 +21,20 @@ class WordsBloc implements Bloc{
   Stream<String> get wordsStream => createWordsController.stream;
   StreamSink<String> get wordsSink => createWordsController.sink;
 
-  void restartBoard(final int tableSize){
+  void _restartBoard(final int tableSize){
     generating = true;
     addedWords.clear();
     filledIndexes.clear();
     wordsDirections.clear();
-    wordsSink.add(null);
+    cleanSink();
     this.tableSize = tableSize;
   }
 
+  void cleanSink() => wordsSink.add(null);
+
   Future<void> generateWords(final int tableSize, final int wordsNumber) async{
     if(generating) return;
-    restartBoard(tableSize);
+    _restartBoard(tableSize);
     for(var i = 0; i < wordsNumber; i++){ /*i < tableSize*/
       final generator = WordGenerator(
         WordsMappings(filledIndexes: filledIndexes,

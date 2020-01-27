@@ -52,6 +52,18 @@ flutter:
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
+  fonts:
+    - family: MavenPro
+      fonts:
+        - asset: fonts/MavenPro-Regular.ttf
+          weight: 400
+        - asset: fonts/MavenPro-Medium.ttf
+          weight: 500
+        - asset: fonts/MavenPro-SemiBold.ttf
+          weight: 600
+        - asset: fonts/MavenPro-Bold.ttf
+          weight: 700
+
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a

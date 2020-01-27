@@ -6,16 +6,22 @@ import 'package:word_soup/models/board_data.dart';
 import 'package:word_soup/ui/game_view.dart';
 
 
-void main() => runApp(MyApp());
+void main(){
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIOverlays([])
+      .then( (_) => SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) => runApp(MyApp()))
+  );
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIOverlays([]);
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: 'MavenPro'
       ),
       home: BlocProvider<WordsBloc>(
           creator: (_context, bag) => WordsBloc(),
@@ -37,7 +43,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   _MyHomePageState();
 
-  final itemsNumber = 8;
+  var itemsNumber = 7;
 
   @override
   void initState() {
@@ -73,10 +79,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 )
             );
           else
-            return GameView(sentence: snapshot.data, tableSize: itemsNumber);
+            return Column(
+              children: <Widget>[
+                GameView(sentence: snapshot.data, tableSize: itemsNumber),
+                FloatingActionButton(
+                  child: Icon(Icons.update),
+                  onPressed: () => updateTableSize(),
+                )
+              ],
+            );
         }
       ),
     );
+  }
+
+  void updateTableSize(){
+    final wordsBloc = BlocProvider.of<WordsBloc>(context);
+    setState(() {
+      wordsBloc.cleanSink();
+      itemsNumber = itemsNumber == 12 ? 7 : itemsNumber+1;
+    });
   }
 
 }

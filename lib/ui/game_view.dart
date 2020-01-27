@@ -24,8 +24,7 @@ class _GameViewState extends State<GameView> {
     final boardData = BoardData.BOARD_MAP[widget.tableSize];
     print("Sentence: ${widget.sentence}");
     return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
+      height: 450,
       margin: EdgeInsets.all(20),
       child: LettersGridView(
           onSelectionChanged: (selection) => setState((){
@@ -37,8 +36,9 @@ class _GameViewState extends State<GameView> {
             }
           }),
           itemCount: widget.tableSize * widget.tableSize,
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: boardData.maxCrossAxisExtent,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            childAspectRatio: 0.7,
+            crossAxisCount: widget.tableSize,
             crossAxisSpacing: boardData.crossAxisSpacing,
             mainAxisSpacing: boardData.mainAxisSpacing,
           ),
