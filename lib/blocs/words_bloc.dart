@@ -33,7 +33,7 @@ class WordsBloc implements Bloc{
     restartBoard(tableSize);
     final random = Random();
     for(var i = 0; i < tableSize; i++){ /*i < tableSize*/
-      final direction = await _getWordDirection(random);
+      final direction = WordDirection.Diagonal;
       final backwards = random.nextInt(2) == 1;
       final word = await _generateRandomWord(backwards, direction);
       final initialPosition = await _generateInitialPosition(
@@ -41,6 +41,7 @@ class WordsBloc implements Bloc{
           backwards: backwards,
           direction: direction
       );
+
       var changingPos = initialPosition;
 
       switch(direction){
@@ -58,15 +59,18 @@ class WordsBloc implements Bloc{
           }
           break;
         case WordDirection.Diagonal:
+          if(changingPos == -1) break;
           for(var i = 0; i < word.length; i++){
             filledIndexes[changingPos] = word[i];
-            changingPos = backwards ? (changingPos - tableSize) - 1 :  (changingPos - tableSize) + 1;
+            changingPos = backwards ? (changingPos - tableSize) - 1 :  (changingPos + tableSize) + 1;
           }
           break;
       }
-
-      addedWords.add(word.toUpperCase());
-      wordsDirections.add(direction);
+      if(changingPos != -1){
+        addedWords.add(word.toUpperCase());
+        wordsDirections.add(direction);
+        print("Current map: $filledIndexes");
+      }
     }
     final buffer = StringBuffer();
     for(var i = 0;i<tableSize * tableSize;i++){
@@ -134,6 +138,13 @@ class WordsBloc implements Bloc{
             else if(direction == WordDirection.Vertical){
               to = "${ i + ( (word.length - 1) * tableSize)}";
             }
+            /*else{
+              var mutablePos = i;
+              for(var j = 0; j<word.length;j++){
+                mutablePos = backwards ? (mutablePos - tableSize) - 1 :  (mutablePos - tableSize) + 1;
+              }
+              to = mutablePos.toString();
+            }*/
             print("The word $word can be added from:$i to:$to");
             break;
           }
@@ -173,9 +184,12 @@ class WordsBloc implements Bloc{
         break;
       case WordDirection.Diagonal:
         for(var i = 0; i<word.length && !keepLooking;i++){
+          final canAdd = backwards ? mutablePos >= 0 :mutablePos < (tableSize * tableSize);
           if(filledIndexes.containsKey(mutablePos) && filledIndexes[mutablePos] != word[i])
             keepLooking = true;
-          mutablePos = backwards ? (mutablePos - tableSize) - 1 :  (mutablePos - tableSize) + 1;
+          if(!canAdd)
+            keepLooking = true;
+          mutablePos = backwards ? (mutablePos - tableSize) - 1 :  (mutablePos + tableSize) + 1;
         }
         break;
     }
@@ -289,7 +303,7 @@ class WordsBloc implements Bloc{
       }
       case WordDirection.Diagonal: {
         final possiblePositionsBackwards = [(tableSize * tableSize) - 1];
-        final possiblePositionsForwards = [(tableSize * (tableSize - 1))];
+        final possiblePositionsForwards = [0];
         final offsetColumns = List<int>();
         for(var i = 0; i < tableSize; i++){
           offsetColumns.add(i * tableSize);
@@ -341,14 +355,12 @@ class WordsBloc implements Bloc{
   }
 
   int finalPositionFromForward(final position, final int acc, final int wordLength, final List<int> offsetColumns){
-    if(position == 34)
-      print("Debug");
     if(acc == wordLength)
       return position;
     else if(offsetColumns.contains(position))
       return tableSize * tableSize + 1;
     else
-      return finalPositionFromForward((position - tableSize) + 1, acc+1, wordLength, offsetColumns);
+      return finalPositionFromForward((position + tableSize) + 1, acc+1, wordLength, offsetColumns);
   }
 
   @override

@@ -45,7 +45,7 @@ class _GameViewState extends State<GameView> {
           ),
           itemBuilder: (context, index, selected){
             return LetterBox(
-              isSelected: selected,
+              isSelected: wordsBloc.filledIndexes.containsKey(index),
               id: index,
               letter: widget.sentence[index],
             );
