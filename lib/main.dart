@@ -2,6 +2,7 @@ import 'package:bloc_provider/bloc_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:word_soup/blocs/words_bloc.dart';
+import 'package:word_soup/models/board_data.dart';
 import 'package:word_soup/ui/game_view.dart';
 
 
@@ -36,7 +37,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   _MyHomePageState();
 
-  final itemsNumber = 6;
+  final itemsNumber = 8;
 
   @override
   void initState() {
@@ -49,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final WordsBloc wordsBloc = BlocProvider.of(context);
-    wordsBloc.generateWords(itemsNumber);
+    wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber);
     return Scaffold(
       body: StreamBuilder<String>(
         stream: wordsBloc.wordsStream,
@@ -72,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 )
             );
           else
-            return GameView(sentence: snapshot.data);
+            return GameView(sentence: snapshot.data, tableSize: itemsNumber);
         }
       ),
     );

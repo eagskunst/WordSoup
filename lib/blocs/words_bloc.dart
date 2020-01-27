@@ -30,10 +30,10 @@ class WordsBloc implements Bloc{
     this.tableSize = tableSize;
   }
 
-  Future<void> generateWords(final int tableSize) async{
+  Future<void> generateWords(final int tableSize, final int wordsNumber) async{
     if(generating) return;
     restartBoard(tableSize);
-    for(var i = 0; i < tableSize; i++){ /*i < tableSize*/
+    for(var i = 0; i < wordsNumber; i++){ /*i < tableSize*/
       final generator = WordGenerator(
         WordsMappings(filledIndexes: filledIndexes,
             addedWords: addedWords,
