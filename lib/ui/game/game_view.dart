@@ -3,10 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:word_soup/blocs/words_bloc.dart';
 import 'package:word_soup/models/board_data.dart';
-import 'package:word_soup/ui/widgets/custom_fab_row.dart';
-import 'package:word_soup/ui/widgets/letter_box.dart';
-import 'package:word_soup/ui/widgets/letters_grid_view.dart';
-import 'package:word_soup/ui/widgets/word_selection_box.dart';
+import 'package:word_soup/ui/game/widgets/custom_fab_row.dart';
+import 'package:word_soup/ui/game/widgets/letter_box.dart';
+import 'package:word_soup/ui/game/widgets/letters_grid_view.dart';
+import 'package:word_soup/ui/game/widgets/word_selection_box.dart';
 import 'package:word_soup/utils/overlay_widgets/level_complete_dialog.dart';
 import 'package:word_soup/utils/overlay_widgets/words_bottom_sheet.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
@@ -47,7 +47,7 @@ class _GameViewState extends State<GameView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Text(
+        /*Text(
           "Level ${widget.level}",
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -55,7 +55,7 @@ class _GameViewState extends State<GameView> {
             fontSize: 26,
             color: Colors.black
           ),
-        ),
+        ),*/
         buildGridView(),
         WordSelectionBox(selection: userSelection),
         CustomFabRow(

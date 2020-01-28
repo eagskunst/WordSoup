@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:word_soup/ui/widgets/letters_grid_view.dart';
+import 'package:word_soup/ui/game/widgets/letters_grid_view.dart';
 import 'package:word_soup/utils/widgets/multi_select_child.dart';
 
 class MultiSelectChildElement extends ProxyElement {

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:word_soup/blocs/words_bloc.dart';
 import 'package:word_soup/models/board_data.dart';
-import 'package:word_soup/ui/game_view.dart';
+import 'package:word_soup/ui/game/game_view.dart';
+import 'package:word_soup/ui/initial_screen/initial_screen.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 
 
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'MavenPro',
+        backgroundColor: Colors.teal,
         bottomSheetTheme: BottomSheetThemeData(
           modalElevation: 8,
           shape: RoundedRectangleBorder(
@@ -30,10 +32,7 @@ class MyApp extends StatelessWidget {
           )
         )
       ),
-      home: BlocProvider<WordsBloc>(
-          creator: (_context, bag) => WordsBloc(),
-          child: MyHomePage()
-      ),
+      home: MyHomePage(),
     );
   }
 }
@@ -56,16 +55,22 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    wordsBloc = BlocProvider.of(context);
-    wordsBloc.userSelectionStream.listen((event) => updateLevel(event));
+    //wordsBloc = BlocProvider.of(context);
+    //wordsBloc.userSelectionStream.listen((event) => updateLevel(event));
     //wordsBloc.generateWords(itemsNumber);*/
   }
 
 
   @override
   Widget build(BuildContext context) {
-    wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber);
+    //wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber);
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      body: SafeArea(
+        child: InitialScreen(),
+      ),
+    );
+    /*return Scaffold(
       resizeToAvoidBottomPadding: false,
       body: SafeArea(
         child: StreamBuilder<String>(
@@ -89,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         ),
       ),
-    );
+    );*/
   }
 
   Widget progressWidget(){

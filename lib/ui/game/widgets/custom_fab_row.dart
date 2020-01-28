@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:word_soup/models/custom_fab_props.dart';
-import 'package:word_soup/ui/widgets/custom_fab.dart';
+import 'custom_fab.dart';
 
 class CustomFabRow extends StatelessWidget {
 

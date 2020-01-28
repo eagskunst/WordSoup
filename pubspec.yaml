@@ -19,6 +19,7 @@ environment:
 dependencies:
   english_words: ^3.1.5
   bloc_provider: ^0.7.0
+  animated_text_kit: ^2.0.0
   flutter:
     sdk: flutter
 

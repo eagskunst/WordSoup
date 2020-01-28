@@ -12,8 +12,9 @@ class LevelCompleteDialog {
                 "Congratulations!",
                 textAlign: TextAlign.start,
                 style: TextStyle(
-                    color: Colors.redAccent,
+                    color: Color(0xff32DE8A),
                     fontWeight: FontWeight.bold,
+                    fontFamily: 'MavenPro',
                     fontSize: 26),
               ),
               content: Padding(

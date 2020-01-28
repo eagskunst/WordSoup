@@ -5,7 +5,7 @@ class CustomFabsPropsCreator {
 
   static List<CustomFabProps> getProps(List<VoidCallback> callbacks) => [
     CustomFabProps(
-        icon: Icons.clear,
+        icon: Icons.delete,
         name: "Clear selection",
         onTap: callbacks[0]
     ),

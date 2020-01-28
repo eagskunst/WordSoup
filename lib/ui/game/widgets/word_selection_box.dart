@@ -30,6 +30,7 @@ class WordSelectionBox extends StatelessWidget {
           selection,
           textAlign: TextAlign.center,
           style: TextStyle(
+            fontFamily: 'MavenPro',
             fontWeight: FontWeight.w500,
             color: Colors.black,
             fontSize: selection.length > 30 ? 16 : 25
