@@ -1,0 +1,3 @@
+enum SelectionEvent {
+  ClearSelection
+}

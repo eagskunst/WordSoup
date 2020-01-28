@@ -82,9 +82,12 @@ class _MyHomePageState extends State<MyHomePage> {
             return Column(
               children: <Widget>[
                 GameView(sentence: snapshot.data, tableSize: itemsNumber),
-                FloatingActionButton(
-                  child: Icon(Icons.update),
-                  onPressed: () => updateTableSize(),
+                Container(
+                  margin: EdgeInsets.only(top: 15),
+                  child: FloatingActionButton(
+                    child: Icon(Icons.update),
+                    onPressed: () => updateTableSize(),
+                  ),
                 )
               ],
             );
@@ -96,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void updateTableSize(){
     final wordsBloc = BlocProvider.of<WordsBloc>(context);
     setState(() {
-      wordsBloc.cleanSink();
+      wordsBloc.cleanWordsSink();
       itemsNumber = itemsNumber == 12 ? 7 : itemsNumber+1;
     });
   }

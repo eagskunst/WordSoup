@@ -1,10 +1,9 @@
 import 'dart:async';
 
-import 'dart:math';
-
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:english_words/english_words.dart';
 import 'package:word_soup/models/words_mappings.dart';
+import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/base/word_direction.dart';
 import 'package:word_soup/utils/word_generator.dart';
 
@@ -17,20 +16,23 @@ class WordsBloc implements Bloc{
 
   WordsBloc();
 
-  StreamController<String> createWordsController = StreamController();
-  Stream<String> get wordsStream => createWordsController.stream;
-  StreamSink<String> get wordsSink => createWordsController.sink;
+  StreamController<String> _createWordsController = StreamController();
+  Stream<String> get wordsStream => _createWordsController.stream;
+  StreamSink<String> get _wordsSink => _createWordsController.sink;
+  StreamController<SelectionEvent> _userSelectionStreamController = StreamController.broadcast();
+  Stream<SelectionEvent> get userSelectionStream => _userSelectionStreamController.stream;
+  StreamSink<SelectionEvent> get _userSelectionSink=> _userSelectionStreamController.sink;
 
   void _restartBoard(final int tableSize){
     generating = true;
     addedWords.clear();
     filledIndexes.clear();
     wordsDirections.clear();
-    cleanSink();
+    cleanWordsSink();
     this.tableSize = tableSize;
   }
 
-  void cleanSink() => wordsSink.add(null);
+  void cleanWordsSink() => _wordsSink.add(null);
 
   Future<void> generateWords(final int tableSize, final int wordsNumber) async{
     if(generating) return;
@@ -88,13 +90,18 @@ class WordsBloc implements Bloc{
       }
     }
     print("Words in soup: $addedWords");
-    wordsSink.add(buffer.toString());
+    _wordsSink.add(buffer.toString());
     generating = false;
   }
 
   @override
   void dispose() async{
-    await createWordsController.close();
+    await _createWordsController.close();
+    await _userSelectionStreamController.close();
+  }
+
+  void clearUserSelection() {
+    _userSelectionSink.add(SelectionEvent.ClearSelection);
   }
 
 }

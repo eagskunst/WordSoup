@@ -1,9 +1,13 @@
+import 'package:bloc_provider/bloc_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:word_soup/blocs/words_bloc.dart';
+import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/widgets/multi_select_child.dart';
 import 'package:word_soup/utils/widgets/multi_select_child_element.dart';
 
 typedef LettersGridViewBuilder = Widget Function(BuildContext context, int index, bool isSelected);
 typedef OnSelectionChange = void Function(List<int> selection);
+typedef OnSelectionUpdate = void Function(List<int> selection);
 
 class LettersGridView extends StatefulWidget {
 
@@ -11,6 +15,7 @@ class LettersGridView extends StatefulWidget {
   const LettersGridView({
     Key key,
     this.onSelectionChanged,
+    this.onSelectionUpdate,
     this.padding,
     @required this.itemCount,
     @required this.itemBuilder,
@@ -19,6 +24,7 @@ class LettersGridView extends StatefulWidget {
   }) : super(key: key);
 
   final OnSelectionChange onSelectionChanged;
+  final OnSelectionUpdate onSelectionUpdate;
   final EdgeInsetsGeometry padding;
   final int itemCount;
   final LettersGridViewBuilder itemBuilder;
@@ -37,6 +43,17 @@ class LettersGridViewState extends State<LettersGridView> {
   bool _goingBackwards = false;
   int _startIndex = -1;
   final indexList = List<int>();
+
+  @override
+  void initState() {
+    super.initState();
+    final WordsBloc bloc = BlocProvider.of(context);
+    bloc.userSelectionStream.listen((event) {
+      if(event != null && event == SelectionEvent.ClearSelection){
+        setState(() => indexList.clear());
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +91,8 @@ class LettersGridViewState extends State<LettersGridView> {
   void _onLongPressUpdate(LongPressMoveUpdateDetails details) {
     if (_isSelecting) {
       _updateEndIndex(details.localPosition);
+      if(widget.onSelectionUpdate != null)
+        widget.onSelectionUpdate?.call(indexList);
     }
   }
 
