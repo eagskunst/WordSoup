@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,13 +20,20 @@ class _GameScaffoldState extends State<GameScaffold> {
   var itemsNumber = 7;
   var level = 1;
   WordsBloc wordsBloc;
+  StreamSubscription<SelectionEvent> _subscription;
 
   @override
   void initState() {
     super.initState();
     wordsBloc = BlocProvider.of(context);
-    wordsBloc.userSelectionStream.listen((event) => updateLevel(event));
+    _subscription = wordsBloc.userSelectionStream.listen((event) => updateLevel(event));
     //wordsBloc.generateWords(itemsNumber);*/
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 
   @override

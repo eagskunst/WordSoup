@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:word_soup/blocs/words_bloc.dart';
@@ -46,11 +48,13 @@ class LettersGridViewState extends State<LettersGridView> {
   int _startIndex = -1;
   final indexList = List<int>();
 
+  StreamSubscription<SelectionEvent> _subscription;
+
   @override
   void initState() {
     super.initState();
     final WordsBloc bloc = BlocProvider.of(context);
-    bloc.userSelectionStream.listen((event) {
+    _subscription = bloc.userSelectionStream.listen((event) {
       print("Event: $event");
       if(event != null){
         switch(event){
@@ -174,6 +178,12 @@ class LettersGridViewState extends State<LettersGridView> {
       }
     }
     return -1;
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 
 }

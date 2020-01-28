@@ -11,7 +11,26 @@ class WordsBottomSheet extends StatelessWidget{
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
       alignment: WrapAlignment.start,
-      children: words,
+      children: [
+        FittedBox(
+          child: Padding(
+            padding: EdgeInsets.all(25),
+            child: Text(
+              'First letters of words in the board',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w600
+              ),
+            ),
+          ),
+        ),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          alignment: WrapAlignment.start,
+          children: words,
+        )
+      ],
     );
   }
 

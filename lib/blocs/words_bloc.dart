@@ -15,11 +15,11 @@ class WordsBloc implements Bloc {
   int tableSize;
   var generating = false;
   final filledIndexes = Map<int, String>();
+  final _wordIndexesString = List<String>();
   final addedWords = List<String>();
   final wordsDirections = List<WordDirection>();
   final _userFoundWords = List<String>();
   final _userFoundWordsIndices = List<int>();
-
 
   WordsBloc();
 
@@ -38,6 +38,7 @@ class WordsBloc implements Bloc {
     wordsDirections.clear();
     _userFoundWords.clear();
     _userFoundWordsIndices.clear();
+    _wordIndexesString.clear();
     cleanWordsSink();
     this.tableSize = tableSize;
   }
@@ -62,11 +63,13 @@ class WordsBloc implements Bloc {
 
       var changingPos = initialPosition;
       print("Iterator: $i, $info");
+      final buffer = StringBuffer();
 
       switch(direction){
         case WordDirection.Horizontal: {
           for(var i = 0; i < word.length; i++){
             filledIndexes[changingPos] = word[i];
+            i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
             backwards ? changingPos -- : changingPos++;
           }
           break;
@@ -74,6 +77,7 @@ class WordsBloc implements Bloc {
         case WordDirection.Vertical:
           for(var i = 0; i < word.length; i++){
             filledIndexes[changingPos] = word[i];
+            i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
             backwards ? changingPos -=tableSize : changingPos+=tableSize;
           }
           break;
@@ -81,6 +85,7 @@ class WordsBloc implements Bloc {
           if(changingPos == -1) break;
           for(var i = 0; i < word.length; i++){
             filledIndexes[changingPos] = word[i];
+            i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
             changingPos = backwards ? (changingPos - tableSize) - 1 :  (changingPos + tableSize) + 1;
           }
           break;
@@ -88,6 +93,7 @@ class WordsBloc implements Bloc {
       if(initialPosition != -1){
         addedWords.add(word.toUpperCase());
         wordsDirections.add(direction);
+        _wordIndexesString.add(buffer.toString());
       }
     }
     final buffer = StringBuffer();
@@ -128,5 +134,19 @@ class WordsBloc implements Bloc {
   List<String> getUserFoundWords() => _userFoundWords.toList(growable: false);
 
   List<int> getUserFoundWordsIndices() => _userFoundWordsIndices.toList(growable: false);
+
+  List<int> getNotFoundWordIndexes() {
+    List<int> indexes;
+    for(int i = 0; i< _wordIndexesString.length; i++){
+      indexes = _wordIndexesString[i].split('-').map( (n) => int.parse(n)).toList(growable: false);
+      final buffer = StringBuffer();
+      indexes.forEach((i) => buffer.write(filledIndexes[i]));
+      print("Buffer word writed: $buffer");
+      if(!_userFoundWords.contains(buffer.toString())){
+        return indexes;
+      }
+    }
+    return List<int>();
+  }
 
 }

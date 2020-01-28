@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:word_soup/models/custom_fab_props.dart';
 
 class CommonButton extends StatelessWidget{
 
@@ -15,7 +16,7 @@ class CommonButton extends StatelessWidget{
       height: 50,
       margin: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
       child: RaisedButton(
-        disabledColor: Colors.amberAccent.withOpacity(0.8),
+        disabledColor: CustomFabProps.COMMON_COLOR.withOpacity(0.8),
         onPressed: onTap,
         padding: EdgeInsets.all(10),
         elevation: 3,
@@ -23,7 +24,7 @@ class CommonButton extends StatelessWidget{
           borderRadius: BorderRadius.circular(10)
         ),
         textColor: Colors.black,
-        color: Colors.amberAccent,
+        color: CustomFabProps.COMMON_COLOR,
         child: Center(
           child: Text(text.toUpperCase()),
         ),

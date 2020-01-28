@@ -32,7 +32,7 @@ class SoupWord extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(model.word,
+          Text(model.word[0],
             style: TextStyle(
               color: model.color == Colors.white ?  Colors.black : Colors.white,
               fontWeight: FontWeight.bold

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:word_soup/models/custom_fab_props.dart';
 
 class WordSelectionBox extends StatelessWidget {
 
@@ -15,7 +16,7 @@ class WordSelectionBox extends StatelessWidget {
       height: 45,
       margin: EdgeInsets.only(left: margin1, right: margin1, top: margin2, bottom: margin2),
       decoration: BoxDecoration(
-        color: Colors.amberAccent,
+        color: CustomFabProps.COMMON_COLOR,
         borderRadius: BorderRadius.circular(5),
         boxShadow: [
           BoxShadow(
