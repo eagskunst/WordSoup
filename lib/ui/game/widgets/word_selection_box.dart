@@ -15,11 +15,11 @@ class WordSelectionBox extends StatelessWidget {
       height: 45,
       margin: EdgeInsets.only(left: margin1, right: margin1, top: margin2, bottom: margin2),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.amberAccent,
         borderRadius: BorderRadius.circular(5),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.7),
+            color: Colors.grey.withOpacity(0.4),
             blurRadius: 6,
             spreadRadius: 0.8,
           )

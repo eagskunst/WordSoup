@@ -7,6 +7,7 @@ import 'package:word_soup/ui/game/widgets/custom_fab_row.dart';
 import 'package:word_soup/ui/game/widgets/letter_box.dart';
 import 'package:word_soup/ui/game/widgets/letters_grid_view.dart';
 import 'package:word_soup/ui/game/widgets/word_selection_box.dart';
+import 'package:word_soup/utils/overlay_widgets/game_complete_dialog.dart';
 import 'package:word_soup/utils/overlay_widgets/level_complete_dialog.dart';
 import 'package:word_soup/utils/overlay_widgets/words_bottom_sheet.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
@@ -47,15 +48,6 @@ class _GameViewState extends State<GameView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        /*Text(
-          "Level ${widget.level}",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 26,
-            color: Colors.black
-          ),
-        ),*/
         buildGridView(),
         WordSelectionBox(selection: userSelection),
         CustomFabRow(
@@ -113,10 +105,11 @@ class _GameViewState extends State<GameView> {
         else{
           SnackBarUtil.createSuccessSnack(context, 'You found $userSelection!');
           wordsBloc.addUserFoundWord(userSelection, selection);
-          wordsBloc.clearUserSelection();
           if(wordsBloc.getUserFoundWords().length == wordsBloc.addedWords.length){
-            createLevelCompletedDialog();
+            if(widget.level != 6) createLevelCompletedDialog();
+            else createGameCompleteDialog();
           }
+          wordsBloc.clearUserSelection();
         }
       }
       else{
@@ -141,6 +134,11 @@ class _GameViewState extends State<GameView> {
   void createLevelCompletedDialog() async {
     final goNextLevel = await LevelCompleteDialog.showLevelCompleteDialog(context, widget.level);
     if(goNextLevel) wordsBloc.triggerLevelComplete();
+  }
+
+  void createGameCompleteDialog() async {
+    await GameCompleteDialog.showGameCompleteDialog(context);
+    Navigator.pop(context);
   }
 
 }
