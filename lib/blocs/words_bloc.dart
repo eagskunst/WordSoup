@@ -35,6 +35,7 @@ class WordsBloc implements Bloc{
     filledIndexes.clear();
     wordsDirections.clear();
     _userFoundWords.clear();
+    _userFoundWordsIndices.clear();
     cleanWordsSink();
     this.tableSize = tableSize;
   }
