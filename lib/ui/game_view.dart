@@ -7,6 +7,7 @@ import 'package:word_soup/ui/widgets/custom_fab_row.dart';
 import 'package:word_soup/ui/widgets/letter_box.dart';
 import 'package:word_soup/ui/widgets/letters_grid_view.dart';
 import 'package:word_soup/ui/widgets/word_selection_box.dart';
+import 'package:word_soup/ui/widgets/words_bottom_sheet.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/custom_fabs_props_creator.dart';
 
@@ -45,15 +46,15 @@ class _GameViewState extends State<GameView> {
         buildGridView(),
         WordSelectionBox(selection: userSelection),
         CustomFabRow(
-            fabsProps: CustomFabsPropsCreator.getProps([
+            fabsProps: CustomFabsPropsCreator.getProps(
+                [
                   () => wordsBloc.clearUserSelection(),
                   () => {},
-                  () => showModalBottomSheet(context: context, builder: (context) {
-                    return Container(
-                      padding: EdgeInsets.all(25),
-                    );
-                  })
-            ])
+                  () => showModalBottomSheet(context: context,
+                    builder: (context) => WordsBottomSheet(words: wordsBloc.createSoupWordsWidget()),
+                  )
+                ]
+            )
         ),
       ],
     );

@@ -21,7 +21,13 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        fontFamily: 'MavenPro'
+        fontFamily: 'MavenPro',
+        bottomSheetTheme: BottomSheetThemeData(
+          modalElevation: 8,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10))
+          )
+        )
       ),
       home: BlocProvider<WordsBloc>(
           creator: (_context, bag) => WordsBloc(),
@@ -57,41 +63,43 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final WordsBloc wordsBloc = BlocProvider.of(context);
     wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber);
-    return Scaffold(
-      body: StreamBuilder<String>(
-        stream: wordsBloc.wordsStream,
-        builder: (context, snapshot) {
-          print("Is null or data is empty: ${snapshot.data == null || snapshot.data.isEmpty}");
-          if(snapshot.data == null || snapshot.data.isEmpty)
-            return Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    CircularProgressIndicator(),
-                    Container(
-                        margin: EdgeInsets.only(top: 10),
-                        child: Text('Cargando')
-                    )
-                  ],
-                )
-            );
-          else
-            return Column(
-              children: <Widget>[
-                GameView(sentence: snapshot.data, tableSize: itemsNumber),
-                Container(
-                  margin: EdgeInsets.only(top: 15),
-                  child: FloatingActionButton(
-                    child: Icon(Icons.update),
-                    onPressed: () => updateTableSize(),
-                  ),
-                )
-              ],
-            );
-        }
+    return SafeArea(
+      child: Scaffold(
+        body: StreamBuilder<String>(
+          stream: wordsBloc.wordsStream,
+          builder: (context, snapshot) {
+            print("Is null or data is empty: ${snapshot.data == null || snapshot.data.isEmpty}");
+            if(snapshot.data == null || snapshot.data.isEmpty)
+              return Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      CircularProgressIndicator(),
+                      Container(
+                          margin: EdgeInsets.only(top: 10),
+                          child: Text('Cargando')
+                      )
+                    ],
+                  )
+              );
+            else
+              return Column(
+                children: <Widget>[
+                  GameView(sentence: snapshot.data, tableSize: itemsNumber),
+                  Container(
+                    margin: EdgeInsets.only(top: 15),
+                    child: FloatingActionButton(
+                      child: Icon(Icons.update),
+                      onPressed: () => updateTableSize(),
+                    ),
+                  )
+                ],
+              );
+          }
+        ),
       ),
     );
   }

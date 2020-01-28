@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:english_words/english_words.dart';
+import 'package:flutter/material.dart';
 import 'package:word_soup/models/words_mappings.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/base/word_direction.dart';
+import 'package:word_soup/utils/widgets/soup_word.dart';
+import 'package:word_soup/utils/widgets/word_model.dart';
 import 'package:word_soup/utils/word_generator.dart';
 
 class WordsBloc implements Bloc{
@@ -103,5 +106,9 @@ class WordsBloc implements Bloc{
   void clearUserSelection() {
     _userSelectionSink.add(SelectionEvent.ClearSelection);
   }
+
+  List<SoupWord> createSoupWordsWidget() => addedWords.map((word) => SoupWord(
+      model: WordModel(word, Colors.white)
+      )).toList(growable: false);
 
 }

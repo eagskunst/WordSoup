@@ -214,7 +214,7 @@ class WordGenerator {
 
           var keepLooking = true;
           int pos = -1;
-          while(keepLooking){
+          while(keepLooking && possiblePositions.isNotEmpty){
             pos = possiblePositions.elementAt(rand.nextInt(possiblePositions.length));
             possiblePositions.remove(pos);
             keepLooking = _checkIfCanAddWord(
@@ -225,7 +225,7 @@ class WordGenerator {
                 sumBy: _getSumOfDirection(backwards, direction)
             );
           }
-          return Future.value(pos);
+          if(!keepLooking) return Future.value(pos);
         }
         break;
       }
@@ -260,7 +260,7 @@ class WordGenerator {
 
           var keepLooking = true;
           int pos = -1;
-          while(keepLooking){
+          while(keepLooking && possiblePositions.isNotEmpty){
             pos = possiblePositions.elementAt(rand.nextInt(possiblePositions.length));
             possiblePositions.remove(pos);
             keepLooking = _checkIfCanAddWord(
@@ -271,7 +271,7 @@ class WordGenerator {
                 sumBy: _getSumOfDirection(backwards, direction)
             );
           }
-          return Future.value(pos);
+          if(!keepLooking) return Future.value(pos);
         }
         break;
       }
