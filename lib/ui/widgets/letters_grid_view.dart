@@ -6,7 +6,7 @@ import 'package:word_soup/utils/widgets/multi_select_child.dart';
 import 'package:word_soup/utils/widgets/multi_select_child_element.dart';
 
 typedef LettersGridViewBuilder = Widget Function(BuildContext context, int index, bool isSelected);
-typedef OnSelectionChange = void Function(List<int> selection);
+typedef OnSelectionEnd = void Function(List<int> selection);
 typedef OnSelectionUpdate = void Function(List<int> selection);
 
 class LettersGridView extends StatefulWidget {
@@ -14,8 +14,9 @@ class LettersGridView extends StatefulWidget {
   //TODO: Pass finded words index as parameter
   const LettersGridView({
     Key key,
-    this.onSelectionChanged,
+    this.onSelectionEnd,
     this.onSelectionUpdate,
+    this.foundIndexes,
     this.padding,
     @required this.itemCount,
     @required this.itemBuilder,
@@ -23,8 +24,9 @@ class LettersGridView extends StatefulWidget {
     this.scrollPadding = const EdgeInsets.all(48.0),
   }) : super(key: key);
 
-  final OnSelectionChange onSelectionChanged;
+  final OnSelectionEnd onSelectionEnd;
   final OnSelectionUpdate onSelectionUpdate;
+  final List<int> foundIndexes;
   final EdgeInsetsGeometry padding;
   final int itemCount;
   final LettersGridViewBuilder itemBuilder;
@@ -49,8 +51,16 @@ class LettersGridViewState extends State<LettersGridView> {
     super.initState();
     final WordsBloc bloc = BlocProvider.of(context);
     bloc.userSelectionStream.listen((event) {
-      if(event != null && event == SelectionEvent.ClearSelection){
-        setState(() => indexList.clear());
+      print("Event: $event");
+      if(event != null){
+        switch(event){
+          case SelectionEvent.ClearSelection:
+            setState(() => indexList.clear());
+            break;
+          case SelectionEvent.CheckSelection:
+            widget.onSelectionEnd.call(indexList);
+            break;
+        }
       }
     });
   }
@@ -67,7 +77,7 @@ class LettersGridViewState extends State<LettersGridView> {
           padding: widget.padding,
           itemCount: widget.itemCount,
           itemBuilder: (BuildContext context, int index) {
-            final selected = indexList.contains(index);
+            final selected = indexList.contains(index) || widget.foundIndexes.contains(index);
             return MultiSelectChild(
               index: index,
               child: widget.itemBuilder(context, index, selected),
@@ -99,9 +109,6 @@ class LettersGridViewState extends State<LettersGridView> {
   void _onLongPressEnd(LongPressEndDetails details) {
     _updateEndIndex(details.localPosition);
     setState(() => _isSelecting = false);
-    if (widget.onSelectionChanged != null) {
-      widget.onSelectionChanged?.call(indexList);
-    }
   }
 
   void _updateEndIndex(Offset localPosition) {

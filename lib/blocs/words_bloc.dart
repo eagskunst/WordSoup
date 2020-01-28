@@ -16,6 +16,9 @@ class WordsBloc implements Bloc{
   final filledIndexes = Map<int, String>();
   final addedWords = List<String>();
   final wordsDirections = List<WordDirection>();
+  final _userFoundWords = List<String>();
+  final _userFoundWordsIndices = List<int>();
+
 
   WordsBloc();
 
@@ -31,6 +34,7 @@ class WordsBloc implements Bloc{
     addedWords.clear();
     filledIndexes.clear();
     wordsDirections.clear();
+    _userFoundWords.clear();
     cleanWordsSink();
     this.tableSize = tableSize;
   }
@@ -103,12 +107,22 @@ class WordsBloc implements Bloc{
     await _userSelectionStreamController.close();
   }
 
-  void clearUserSelection() {
-    _userSelectionSink.add(SelectionEvent.ClearSelection);
-  }
+  void clearUserSelection() => _userSelectionSink.add(SelectionEvent.ClearSelection);
+
+
+  void checkUserSelection() => _userSelectionSink.add(SelectionEvent.CheckSelection);
 
   List<SoupWord> createSoupWordsWidget() => addedWords.map((word) => SoupWord(
-      model: WordModel(word, Colors.white)
+      model: WordModel(word, _userFoundWords.contains(word) ? Colors.indigo : Colors.white)
       )).toList(growable: false);
+
+  void addUserFoundWord(String word, List<int> indices) {
+    _userFoundWords.add(word);
+    _userFoundWordsIndices.addAll(indices);
+  }
+
+  List<String> getUserFoundWords() => _userFoundWords.toList(growable: false);
+
+  List<int> getUserFoundWordsIndices() => _userFoundWordsIndices.toList(growable: false);
 
 }

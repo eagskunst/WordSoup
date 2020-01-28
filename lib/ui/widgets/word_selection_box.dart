@@ -10,9 +10,8 @@ class WordSelectionBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
+    return Container(
       width: MediaQuery.of(context).size.width,
-      duration: Duration(milliseconds: 300),
       height: 45,
       margin: EdgeInsets.only(left: margin1, right: margin1, top: margin2, bottom: margin2),
       decoration: BoxDecoration(

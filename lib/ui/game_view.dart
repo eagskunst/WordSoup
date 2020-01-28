@@ -10,6 +10,7 @@ import 'package:word_soup/ui/widgets/word_selection_box.dart';
 import 'package:word_soup/ui/widgets/words_bottom_sheet.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/custom_fabs_props_creator.dart';
+import 'package:word_soup/utils/snackbar_util.dart';
 
 class GameView extends StatefulWidget {
 
@@ -25,22 +26,22 @@ class GameView extends StatefulWidget {
 class _GameViewState extends State<GameView> {
 
   var userSelection = '';
+  WordsBloc wordsBloc;
 
   @override
   void initState() {
     super.initState();
-    final WordsBloc bloc = BlocProvider.of(context);
-    bloc.userSelectionStream.listen((event) {
-      if(event != null && event == SelectionEvent.ClearSelection){
-        _onSelectionUpdate([]);
+    wordsBloc = BlocProvider.of(context);
+    wordsBloc.userSelectionStream.listen((event) {
+      if(event != null){
+        checkEvent(event);
       }
     });
+    print("Sentence: ${widget.sentence}");
   }
 
   @override
   Widget build(BuildContext context) {
-    print("Sentence: ${widget.sentence}");
-    final WordsBloc wordsBloc = BlocProvider.of(context);
     return Column(
       children: <Widget>[
         buildGridView(),
@@ -49,7 +50,7 @@ class _GameViewState extends State<GameView> {
             fabsProps: CustomFabsPropsCreator.getProps(
                 [
                   () => wordsBloc.clearUserSelection(),
-                  () => {},
+                  () => wordsBloc.checkUserSelection(),
                   () => showModalBottomSheet(context: context,
                     builder: (context) => WordsBottomSheet(words: wordsBloc.createSoupWordsWidget()),
                   )
@@ -63,11 +64,12 @@ class _GameViewState extends State<GameView> {
   Widget buildGridView(){
     final boardData = BoardData.BOARD_MAP[widget.tableSize];
     return Container(
-      height: 410,
+      height: boardData.gridHeight,
       margin: EdgeInsets.all(20),
       child: LettersGridView(
-          onSelectionChanged: _onSelectionChange,
+          onSelectionEnd: _onSelectionEnd,
           onSelectionUpdate: _onSelectionUpdate,
+          foundIndexes: wordsBloc.getUserFoundWordsIndices(),
           itemCount: widget.tableSize * widget.tableSize,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             childAspectRatio: 0.7,
@@ -77,7 +79,7 @@ class _GameViewState extends State<GameView> {
           ),
           itemBuilder: (context, index, selected){
             return LetterBox(
-              isSelected: selected /*wordsBloc.filledIndexes.containsKey(index)*/,
+              isSelected: selected,
               id: index,
               letter: widget.sentence[index],
             );
@@ -86,14 +88,25 @@ class _GameViewState extends State<GameView> {
     );
   }
 
-  void _onSelectionChange(List<int> selection){
-    final WordsBloc wordsBloc = BlocProvider.of(context);
+  void _onSelectionEnd(List<int> selection){
+    final userSelection = _createWordFromIndexes(selection);
 
     setState((){
-      print("ENTER SELECTION CHANGE");
-      final userSelection = _createWordFromIndexes(selection);
+      print("On selection end");
       if(wordsBloc.addedWords.contains(userSelection)){
         print("Word finded: $userSelection");
+        if(wordsBloc.getUserFoundWords().contains(userSelection)){
+          SnackbarUtil.createErrorSnack(context, 'You have already found $userSelection');
+        }
+        else{
+          SnackbarUtil.createSuccessSnack(context, 'You found $userSelection!');
+          wordsBloc.addUserFoundWord(userSelection, selection);
+          wordsBloc.clearUserSelection();
+        }
+      }
+      else{
+        SnackbarUtil.createErrorSnack(context, 'Ups! That did not match a soup word');
+        wordsBloc.clearUserSelection();
       }
     });
   }
