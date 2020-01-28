@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class SnackbarUtil {
+class SnackBarUtil {
 
   static void createErrorSnack(BuildContext context, String msg) => Scaffold.of(context).showSnackBar(
     SnackBar(

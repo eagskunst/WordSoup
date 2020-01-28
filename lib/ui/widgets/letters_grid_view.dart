@@ -60,6 +60,8 @@ class LettersGridViewState extends State<LettersGridView> {
           case SelectionEvent.CheckSelection:
             widget.onSelectionEnd.call(indexList);
             break;
+          case SelectionEvent.LevelCompleteSelection:
+            break;
         }
       }
     });

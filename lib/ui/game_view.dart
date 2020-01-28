@@ -7,7 +7,8 @@ import 'package:word_soup/ui/widgets/custom_fab_row.dart';
 import 'package:word_soup/ui/widgets/letter_box.dart';
 import 'package:word_soup/ui/widgets/letters_grid_view.dart';
 import 'package:word_soup/ui/widgets/word_selection_box.dart';
-import 'package:word_soup/ui/widgets/words_bottom_sheet.dart';
+import 'package:word_soup/utils/overlay_widgets/level_complete_dialog.dart';
+import 'package:word_soup/utils/overlay_widgets/words_bottom_sheet.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/custom_fabs_props_creator.dart';
 import 'package:word_soup/utils/snackbar_util.dart';
@@ -16,8 +17,9 @@ class GameView extends StatefulWidget {
 
   final String sentence;
   final int tableSize;
+  final int level;
 
-  GameView({Key key, @required this.sentence, @required this.tableSize});
+  GameView({Key key, @required this.sentence, @required this.tableSize, @required this.level});
 
   @override
   _GameViewState createState() => _GameViewState();
@@ -43,7 +45,17 @@ class _GameViewState extends State<GameView> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
+        Text(
+          "Level ${widget.level}",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 26,
+            color: Colors.black
+          ),
+        ),
         buildGridView(),
         WordSelectionBox(selection: userSelection),
         CustomFabRow(
@@ -96,16 +108,19 @@ class _GameViewState extends State<GameView> {
       if(wordsBloc.addedWords.contains(userSelection)){
         print("Word finded: $userSelection");
         if(wordsBloc.getUserFoundWords().contains(userSelection)){
-          SnackbarUtil.createErrorSnack(context, 'You have already found $userSelection');
+          SnackBarUtil.createErrorSnack(context, 'You have already found $userSelection');
         }
         else{
-          SnackbarUtil.createSuccessSnack(context, 'You found $userSelection!');
+          SnackBarUtil.createSuccessSnack(context, 'You found $userSelection!');
           wordsBloc.addUserFoundWord(userSelection, selection);
           wordsBloc.clearUserSelection();
+          if(wordsBloc.getUserFoundWords().length == wordsBloc.addedWords.length){
+            createLevelCompletedDialog();
+          }
         }
       }
       else{
-        SnackbarUtil.createErrorSnack(context, 'Ups! That did not match a soup word');
+        SnackBarUtil.createErrorSnack(context, 'Ups! That did not match a soup word');
         wordsBloc.clearUserSelection();
       }
     });
@@ -121,6 +136,11 @@ class _GameViewState extends State<GameView> {
 
   void checkEvent(SelectionEvent event){
     if(event == SelectionEvent.ClearSelection) _onSelectionUpdate([]);
+  }
+
+  void createLevelCompletedDialog() async {
+    final goNextLevel = await LevelCompleteDialog.showLevelCompleteDialog(context, widget.level);
+    if(goNextLevel) wordsBloc.triggerLevelComplete();
   }
 
 }

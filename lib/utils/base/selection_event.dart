@@ -1,3 +1,3 @@
 enum SelectionEvent {
-  ClearSelection, CheckSelection
+  ClearSelection, CheckSelection, LevelCompleteSelection
 }

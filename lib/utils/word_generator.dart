@@ -103,7 +103,7 @@ class WordGenerator {
     var keepLooking = true;
     var word = "";
     while(keepLooking){
-      word = WordPair.random().first;
+      word = WordPair.random().first.toUpperCase();
       if(!addedWords.contains(word) && word.length <= tableSize){
         for(var i = 0; i < tableSize * tableSize; i++){
           keepLooking = _checkIfCanAddWord(
