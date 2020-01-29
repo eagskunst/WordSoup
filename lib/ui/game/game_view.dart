@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:word_soup/blocs/words_bloc.dart';
@@ -77,14 +78,14 @@ class _GameViewState extends State<GameView> {
     final boardData = BoardData.BOARD_MAP[widget.tableSize];
     return Container(
       height: boardData.gridHeight,
-      margin: EdgeInsets.all(20),
+      margin: kIsWeb ? EdgeInsets.symmetric(vertical: 5, horizontal: 20) : EdgeInsets.all(20),
       child: LettersGridView(
           onSelectionEnd: _onSelectionEnd,
           onSelectionUpdate: _onSelectionUpdate,
           foundIndexes: wordsBloc.getUserFoundWordsIndices(),
           itemCount: widget.tableSize * widget.tableSize,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            childAspectRatio: 0.7,
+            childAspectRatio: kIsWeb ? 4 : 0.7,
             crossAxisCount: widget.tableSize,
             crossAxisSpacing: boardData.crossAxisSpacing,
             mainAxisSpacing: boardData.mainAxisSpacing,

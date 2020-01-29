@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:word_soup/models/custom_fab_props.dart';
 
@@ -5,7 +6,7 @@ class WordSelectionBox extends StatelessWidget {
 
   final String selection;
   final double margin1 = 25;
-  final double margin2 = 5;
+  final double margin2 = kIsWeb ? 0 : 5;
 
   const WordSelectionBox({Key key, this.selection}) : super(key: key);
 

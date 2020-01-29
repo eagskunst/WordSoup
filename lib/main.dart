@@ -1,13 +1,19 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:word_soup/ui/initial_screen/initial_screen.dart';
 
 void main(){
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setEnabledSystemUIOverlays([])
-      .then( (_) => SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) => runApp(MyApp()))
-  );
+  if(!kIsWeb){
+    SystemChrome.setEnabledSystemUIOverlays([])
+        .then( (_) => SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+        .then((_) => runApp(MyApp()))
+    );
+  }
+  else runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
