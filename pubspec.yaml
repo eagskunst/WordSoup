@@ -20,6 +20,8 @@ dependencies:
   english_words: ^3.1.5
   bloc_provider: ^0.7.0
   animated_text_kit: ^2.0.0
+  json_serializable: ^3.2.5
+  shared_preferences: ^0.5.6+1
   flutter:
     sdk: flutter
 
@@ -28,6 +30,7 @@ dependencies:
   cupertino_icons: ^0.1.2
 
 dev_dependencies:
+  build_runner: ^1.7.3
   flutter_test:
     sdk: flutter
 

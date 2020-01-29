@@ -5,17 +5,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:word_soup/blocs/words_bloc.dart';
 import 'package:word_soup/models/board_data.dart';
+import 'package:word_soup/models/gameboard_state.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/overlay_widgets/close_game_dialog.dart';
 
 import 'game_view.dart';
 
 class GameScaffold extends StatefulWidget {
+
+  final GameBoardState boardState;
+
+  const GameScaffold({Key key, this.boardState}) : super(key: key);
+
   @override
   _GameScaffoldState createState() => _GameScaffoldState();
 }
 
-class _GameScaffoldState extends State<GameScaffold> {
+class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserver{
 
   var itemsNumber = 7;
   var level = 1;
@@ -27,27 +33,48 @@ class _GameScaffoldState extends State<GameScaffold> {
     super.initState();
     wordsBloc = BlocProvider.of(context);
     _subscription = wordsBloc.userSelectionStream.listen((event) => updateLevel(event));
-    //wordsBloc.generateWords(itemsNumber);*/
+    WidgetsBinding.instance.addObserver(this);
+    if(widget.boardState == null){
+      wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber);
+    }
+    else{
+      itemsNumber = widget.boardState.tableSize;
+      level = widget.boardState.level;
+      wordsBloc.generateWordsFromSavedState(widget.boardState);
+    }
   }
 
   @override
   void dispose() {
     _subscription.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state){
+    if(state == AppLifecycleState.paused){
+      wordsBloc.saveGameBoardData(this.level);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber);
     return WillPopScope(
-      onWillPop: () async => await popNavigation(),
+      onWillPop: () async {
+        final saveAndExit = await popNavigation();
+        if(saveAndExit){
+          await wordsBloc.saveGameBoardData(level);
+        }
+        return saveAndExit;
+      },
       child: Scaffold(
         resizeToAvoidBottomPadding: false,
         appBar: CupertinoNavigationBar(
           leading: InkWell(
             onTap: () async {
               if(await popNavigation()){
-                Navigator.pop(context);
+                wordsBloc.saveGameBoardData(level).then((_) => Navigator.pop(context));
               }
             },
             child: Icon(
@@ -114,13 +141,14 @@ class _GameScaffoldState extends State<GameScaffold> {
   }
 
   void updateLevel(SelectionEvent event){
-    print("Enter update level, event: $event");
-    if(event != SelectionEvent.LevelCompleteSelection) return
-      print("Enter update level");
+    print("Update level, event: $event");
+    if(event != SelectionEvent.LevelCompleteSelection) return;
+    if(!mounted) return;
     setState(() {
       wordsBloc.cleanWordsSink();
       itemsNumber = itemsNumber == 12 ? 7 : itemsNumber+1;
       level = level == 6 ? 1 : level+1;
+      wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber);
     });
   }
 }

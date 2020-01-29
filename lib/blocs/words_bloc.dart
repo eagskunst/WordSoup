@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:word_soup/models/gameboard_state.dart';
 import 'package:word_soup/models/words_mappings.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/base/word_direction.dart';
+import 'package:word_soup/utils/constants.dart';
 import 'package:word_soup/utils/widgets/soup_word.dart';
 import 'package:word_soup/utils/widgets/word_model.dart';
 import 'package:word_soup/utils/word_generator.dart';
@@ -20,6 +24,8 @@ class WordsBloc implements Bloc {
   final wordsDirections = List<WordDirection>();
   final _userFoundWords = List<String>();
   final _userFoundWordsIndices = List<int>();
+
+  var unlockWordEnable = true;
 
   WordsBloc();
 
@@ -39,6 +45,7 @@ class WordsBloc implements Bloc {
     _userFoundWords.clear();
     _userFoundWordsIndices.clear();
     _wordIndexesString.clear();
+    unlockWordEnable = true;
     cleanWordsSink();
     this.tableSize = tableSize;
   }
@@ -96,6 +103,29 @@ class WordsBloc implements Bloc {
         _wordIndexesString.add(buffer.toString());
       }
     }
+    final sentence = await createSentence();
+    _wordsSink.add(sentence);
+    generating = false;
+  }
+
+  Future<void> generateWordsFromSavedState(final GameBoardState state) async{
+    if(generating) return;
+    print(state);
+    generating = true;
+    _restartBoard(state.tableSize);
+    unlockWordEnable = state.unlockWordEnable;
+    filledIndexes.addAll(state.filledIndexes);
+    _wordIndexesString.addAll(state.wordIndexesString);
+    addedWords.addAll(state.addedWords);
+    wordsDirections.addAll(state.wordsDirections);
+    _userFoundWords.addAll(state.userFoundWords);
+    _userFoundWordsIndices.addAll(state.userFoundWordsIndices);
+    final sentence = await createSentence();
+    _wordsSink.add(sentence);
+    generating = false;
+  }
+
+  Future<String> createSentence(){
     final buffer = StringBuffer();
     for(var i = 0;i<tableSize * tableSize;i++){
       if(filledIndexes[i] != null){
@@ -106,8 +136,7 @@ class WordsBloc implements Bloc {
       }
     }
     print("Words in soup: $addedWords");
-    _wordsSink.add(buffer.toString());
-    generating = false;
+    return Future.value(buffer.toString());
   }
 
   @override
@@ -147,6 +176,13 @@ class WordsBloc implements Bloc {
       }
     }
     return List<int>();
+  }
+
+  Future<void> saveGameBoardData(int level) async {
+    final currentState = GameBoardState(level, tableSize, filledIndexes, _wordIndexesString,
+        addedWords, wordsDirections,_userFoundWords, _userFoundWordsIndices, unlockWordEnable);
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(Constants.GAME_BOARD_STATE_KEY, jsonEncode(currentState));
   }
 
 }

@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:word_soup/blocs/words_bloc.dart';
 import 'package:word_soup/models/board_data.dart';
 import 'package:word_soup/ui/game/widgets/custom_fab_row.dart';
 import 'package:word_soup/ui/game/widgets/letter_box.dart';
 import 'package:word_soup/ui/game/widgets/letters_grid_view.dart';
 import 'package:word_soup/ui/game/widgets/word_selection_box.dart';
+import 'package:word_soup/utils/constants.dart';
 import 'package:word_soup/utils/overlay_widgets/game_complete_dialog.dart';
 import 'package:word_soup/utils/overlay_widgets/level_complete_dialog.dart';
 import 'package:word_soup/utils/overlay_widgets/words_bottom_sheet.dart';
@@ -31,7 +33,6 @@ class GameView extends StatefulWidget {
 class _GameViewState extends State<GameView> {
 
   var userSelection = '';
-  var unlockWordEnable = true;
   WordsBloc wordsBloc;
   StreamSubscription<SelectionEvent> _subscription;
 
@@ -63,9 +64,9 @@ class _GameViewState extends State<GameView> {
                   () => showModalBottomSheet(context: context,
                     builder: (context) => WordsBottomSheet(words: wordsBloc.createSoupWordsWidget()),
                   ),
-                  () => unlockWordEnable ? unlockWord() : SnackBarUtil.createErrorSnack(context, 'You have already unlocked a word')
+                  () => wordsBloc.unlockWordEnable ? unlockWord() : SnackBarUtil.createErrorSnack(context, 'You have already unlocked a word')
                 ],
-              unlockWordEnable
+                wordsBloc.unlockWordEnable
             )
         ),
       ],
@@ -114,7 +115,6 @@ class _GameViewState extends State<GameView> {
           if(wordsBloc.getUserFoundWords().length == wordsBloc.addedWords.length){
             if(widget.level != 6) createLevelCompletedDialog();
             else createGameCompleteDialog();
-            unlockWordEnable = true;
           }
           else{
             SnackBarUtil.createSuccessSnack(context, 'You found $userSelection!');
@@ -148,13 +148,15 @@ class _GameViewState extends State<GameView> {
 
   void createGameCompleteDialog() async {
     await GameCompleteDialog.showGameCompleteDialog(context);
+    await SharedPreferences.getInstance()
+      ..setString(Constants.GAME_BOARD_STATE_KEY, null);
     Navigator.pop(context);
   }
 
   void unlockWord() {
     wordsBloc.clearUserSelection();
     _onSelectionEnd(wordsBloc.getNotFoundWordIndexes());
-    unlockWordEnable = false;
+    wordsBloc.unlockWordEnable = false;
   }
 
   @override
