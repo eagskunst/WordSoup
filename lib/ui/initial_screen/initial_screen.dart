@@ -28,6 +28,7 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
       final boardState = GameBoardState.fromJson(boardJson);
       setState(() => _gameboardState = boardState);
     }
+    else setState(() => _gameboardState = null);
   }
 
   void deleteGameBoard() async {
@@ -46,7 +47,7 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
         SizedBox(
           height: 150,
           child: TypewriterAnimatedTextKit(
-            text: ['Word \nSoup'],
+            text: ['Word \nSearch'],
             textAlign: TextAlign.center,
             isRepeatingAnimation: true,
             speed: Duration(milliseconds: 500),
@@ -61,11 +62,11 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
         ),
         CommonButton(
           text: 'New game'.toUpperCase(),
-          onTap: () => navigateToGame(context),
+          onTap: () => navigateToGame(context, null),
         ),
         CommonButton(
           text: 'Continue'.toUpperCase(),
-          onTap: _gameboardState == null ? null : () => navigateToGame(context),
+          onTap: _gameboardState == null ? null : () => navigateToGame(context, _gameboardState),
         ),
         CommonButton(
           text: 'Instructions'.toUpperCase(),
@@ -78,13 +79,13 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
     );
   }
 
-  void navigateToGame(BuildContext context){
+  void navigateToGame(BuildContext context, GameBoardState gameBoardState){
     Navigator.push(
         context,
         MaterialPageRoute(builder: (context) =>
             BlocProvider<WordsBloc>(
                 creator: (_context, bag) => WordsBloc(),
-                child: GameScaffold(boardState: _gameboardState)
+                child: GameScaffold(boardState: gameBoardState)
             )
         )
     );
