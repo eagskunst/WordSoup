@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 
 class LevelCompleteDialog {
 
-  static Future showLevelCompleteDialog(BuildContext context, int level) =>
+  static Future showLevelCompleteDialog(BuildContext context, String userName, int level) =>
       showCupertinoDialog(
           context: context,
           builder: (context) {
             return CupertinoAlertDialog(
               title: Text(
-                "Congratulations!",
+                "Congratulations $userName!",
                 textAlign: TextAlign.start,
                 style: TextStyle(
                     color: Color(0xff32DE8A),

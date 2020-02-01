@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class GameCompleteDialog {
-  static Future showGameCompleteDialog(context) =>
+  static Future showGameCompleteDialog(context, String userName) =>
       showCupertinoDialog(
           context: context,
           builder: (context) {
             return CupertinoAlertDialog(
               title: Text(
-                "Congratulations!",
+                "Congratulations $userName!",
                 textAlign: TextAlign.start,
                 style: TextStyle(
                     color: Color(0xff32DE8A),

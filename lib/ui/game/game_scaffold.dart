@@ -14,8 +14,9 @@ import 'game_view.dart';
 class GameScaffold extends StatefulWidget {
 
   final GameBoardState boardState;
+  final String name;//User's name
 
-  const GameScaffold({Key key, this.boardState}) : super(key: key);
+  const GameScaffold({Key key, this.boardState, this.name}) : super(key: key);
 
   @override
   _GameScaffoldState createState() => _GameScaffoldState();
@@ -42,6 +43,7 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
       level = widget.boardState.level;
       wordsBloc.generateWordsFromSavedState(widget.boardState);
     }
+    wordsBloc.userName = widget.name;
   }
 
   @override
@@ -82,12 +84,24 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
               color: Colors.black,
             ),
           ),
-          middle: Text(
-            'Level $level',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 22
-            ),
+          middle: Column(
+            children: [
+              Text(
+                'Level $level',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22
+                ),
+              ),
+              Text(
+                'Player: ${widget.name}',
+                style: TextStyle(
+                    color: Colors.grey.withOpacity(0.6),
+                    fontWeight: FontWeight.normal,
+                    fontSize: 14
+                ),
+              ),
+            ]
           ),
         ),
         body: SafeArea(

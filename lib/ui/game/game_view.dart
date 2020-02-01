@@ -142,12 +142,12 @@ class _GameViewState extends State<GameView> {
   }
 
   void createLevelCompletedDialog() async {
-    final goNextLevel = await LevelCompleteDialog.showLevelCompleteDialog(context, widget.level);
+    final goNextLevel = await LevelCompleteDialog.showLevelCompleteDialog(context, wordsBloc.userName, widget.level);
     if(goNextLevel) wordsBloc.triggerLevelComplete();
   }
 
   void createGameCompleteDialog() async {
-    await GameCompleteDialog.showGameCompleteDialog(context);
+    await GameCompleteDialog.showGameCompleteDialog(context, wordsBloc.userName);
     await SharedPreferences.getInstance()
       ..setString(Constants.GAME_BOARD_STATE_KEY, null);
     Navigator.pop(context);

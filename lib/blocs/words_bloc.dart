@@ -18,6 +18,7 @@ class WordsBloc implements Bloc {
 
   int tableSize;
   var generating = false;
+  String userName;
   final filledIndexes = Map<int, String>();
   final _wordIndexesString = List<String>();
   final addedWords = List<String>();
@@ -112,6 +113,7 @@ class WordsBloc implements Bloc {
     if(generating) return;
     print(state);
     generating = true;
+    this.userName = state.userName;
     _restartBoard(state.tableSize);
     unlockWordEnable = state.unlockWordEnable;
     filledIndexes.addAll(state.filledIndexes);
@@ -179,7 +181,7 @@ class WordsBloc implements Bloc {
   }
 
   Future<void> saveGameBoardData(int level) async {
-    final currentState = GameBoardState(level, tableSize, filledIndexes, _wordIndexesString,
+    final currentState = GameBoardState(level, tableSize, this.userName, filledIndexes, _wordIndexesString,
         addedWords, wordsDirections,_userFoundWords, _userFoundWordsIndices, unlockWordEnable);
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(Constants.GAME_BOARD_STATE_KEY, jsonEncode(currentState));

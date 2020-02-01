@@ -8,6 +8,7 @@ part 'gameboard_state.g.dart';
 class GameBoardState {
   final int level;
   final int tableSize;
+  final String userName;
   final Map<int, String> filledIndexes;
   final List<String> wordIndexesString;
   final List<String> addedWords;
@@ -16,7 +17,7 @@ class GameBoardState {
   final List<int> userFoundWordsIndices;
   final bool unlockWordEnable;
 
-  GameBoardState(this.level, this.tableSize, this.filledIndexes, this.wordIndexesString, this.addedWords,
+  GameBoardState(this.level, this.tableSize, this.userName, this.filledIndexes, this.wordIndexesString, this.addedWords,
       this.wordsDirections, this.userFoundWords, this.userFoundWordsIndices,
       this.unlockWordEnable);
 
@@ -25,5 +26,5 @@ class GameBoardState {
   Map<String, dynamic> toJson() => _$GameBoardStateToJson(this);
 
   @override
-  String toString() => 'GameBoardState(level: $level, tableSize: $tableSize, filledIndexes: $filledIndexes, wordIndexesString: $wordIndexesString, addedWords: $addedWords, wordsDirections: $wordsDirections, userFoundWords: $userFoundWords, userFoundWordsIndices: $userFoundWordsIndices, unlockWordEnable: $unlockWordEnable)';
+  String toString() => 'GameBoardState(level: $level, tableSize: $tableSize, userName: $userName, filledIndexes: $filledIndexes, wordIndexesString: $wordIndexesString, addedWords: $addedWords, wordsDirections: $wordsDirections, userFoundWords: $userFoundWords, userFoundWordsIndices: $userFoundWordsIndices, unlockWordEnable: $unlockWordEnable)';
 }
