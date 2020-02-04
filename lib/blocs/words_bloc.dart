@@ -9,6 +9,7 @@ import 'package:word_soup/models/gameboard_state.dart';
 import 'package:word_soup/models/words_mappings.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/base/word_direction.dart';
+import 'package:word_soup/utils/color_generator.dart';
 import 'package:word_soup/utils/constants.dart';
 import 'package:word_soup/utils/widgets/soup_word.dart';
 import 'package:word_soup/utils/widgets/word_model.dart';
@@ -26,6 +27,8 @@ class WordsBloc implements Bloc {
   final _userFoundWords = List<String>();
   final _userFoundWordsIndices = List<int>();
   final themesIntegers = List<int>();
+  final List<int> wordsColors = ColorGenerator().getColors();
+  final filledIndexesColors = Map<int, int>();
 
   var unlockWordEnable = true;
 
@@ -48,6 +51,7 @@ class WordsBloc implements Bloc {
     _userFoundWordsIndices.clear();
     _wordIndexesString.clear();
     unlockWordEnable = true;
+    filledIndexesColors.clear();
     cleanWordsSink();
     this.tableSize = tableSize;
   }
@@ -125,6 +129,10 @@ class WordsBloc implements Bloc {
     if(themesIntegers.isNotEmpty)
       themesIntegers.clear();
     themesIntegers.addAll(state.themesIntegers);
+    if(wordsColors.isNotEmpty)
+      wordsColors.clear();
+    wordsColors.addAll(state.wordsColors);
+    filledIndexesColors.addAll(state.filledIndexesColors);
     filledIndexes.addAll(state.filledIndexes);
     _wordIndexesString.addAll(state.wordIndexesString);
     addedWords.addAll(state.addedWords);
@@ -169,6 +177,10 @@ class WordsBloc implements Bloc {
   void addUserFoundWord(String word, List<int> indices) {
     _userFoundWords.add(word);
     _userFoundWordsIndices.addAll(indices);
+    for(final int index in indices){
+      filledIndexesColors[index] = wordsColors[0];
+    }
+    wordsColors.removeAt(0);
   }
 
   List<String> getUserFoundWords() => _userFoundWords.toList(growable: false);
@@ -195,9 +207,12 @@ class WordsBloc implements Bloc {
     themesIntegers.addAll(themeList);
   }
 
+  Color getLetterColorByIndex(final int index) => filledIndexesColors.containsKey(index) ? Color(filledIndexesColors[index]) : Color(wordsColors[0]);
+
   Future<void> saveGameBoardData(int level) async {
     final currentState = GameBoardState(level, tableSize, this.userName, filledIndexes, _wordIndexesString,
-        addedWords, wordsDirections,_userFoundWords, _userFoundWordsIndices, this.themesIntegers,  unlockWordEnable);
+        addedWords, wordsDirections,_userFoundWords, _userFoundWordsIndices, this.themesIntegers, this.wordsColors,
+        this.filledIndexesColors, unlockWordEnable);
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(Constants.GAME_BOARD_STATE_KEY, jsonEncode(currentState));
   }

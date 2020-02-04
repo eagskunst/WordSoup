@@ -94,6 +94,7 @@ class _GameViewState extends State<GameView> {
               isSelected: selected,
               id: index,
               letter: widget.sentence[index],
+              selectedColor: wordsBloc.getLetterColorByIndex(index),
             );
           }
       ),
