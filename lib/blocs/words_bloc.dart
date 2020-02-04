@@ -52,6 +52,7 @@ class WordsBloc implements Bloc {
     _wordIndexesString.clear();
     unlockWordEnable = true;
     filledIndexesColors.clear();
+    wordsColors.addAll(ColorGenerator().getColors());
     cleanWordsSink();
     this.tableSize = tableSize;
   }
