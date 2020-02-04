@@ -15,10 +15,11 @@ class GameBoardState {
   final List<WordDirection> wordsDirections;
   final List<String> userFoundWords;
   final List<int> userFoundWordsIndices;
+  final List<int> themesIntegers;
   final bool unlockWordEnable;
 
   GameBoardState(this.level, this.tableSize, this.userName, this.filledIndexes, this.wordIndexesString, this.addedWords,
-      this.wordsDirections, this.userFoundWords, this.userFoundWordsIndices,
+      this.wordsDirections, this.userFoundWords, this.userFoundWordsIndices, this.themesIntegers,
       this.unlockWordEnable);
 
   factory GameBoardState.fromJson(Map<String, dynamic> json) => _$GameBoardStateFromJson(json);
@@ -26,5 +27,5 @@ class GameBoardState {
   Map<String, dynamic> toJson() => _$GameBoardStateToJson(this);
 
   @override
-  String toString() => 'GameBoardState(level: $level, tableSize: $tableSize, userName: $userName, filledIndexes: $filledIndexes, wordIndexesString: $wordIndexesString, addedWords: $addedWords, wordsDirections: $wordsDirections, userFoundWords: $userFoundWords, userFoundWordsIndices: $userFoundWordsIndices, unlockWordEnable: $unlockWordEnable)';
+  String toString() => 'GameBoardState(level: $level, tableSize: $tableSize, userName: $userName, filledIndexes: $filledIndexes, wordIndexesString: $wordIndexesString, addedWords: $addedWords, wordsDirections: $wordsDirections, userFoundWords: $userFoundWords, userFoundWordsIndices: $userFoundWordsIndices, themesIntegers: $themesIntegers, unlockWordEnable: $unlockWordEnable)';
 }

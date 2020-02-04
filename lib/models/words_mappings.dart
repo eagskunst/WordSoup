@@ -6,7 +6,8 @@ class WordsMappings {
   final List<String> addedWords;
   final List<WordDirection> wordsDirections;
   final int tableSize;
+  final int theme;
 
   WordsMappings({@required this.filledIndexes, @required this.addedWords, @required this.wordsDirections,
-    @required this.tableSize});
+    @required this.tableSize, @required this.theme});
 }

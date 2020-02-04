@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:english_words/english_words.dart';
 import 'package:word_soup/models/word_info.dart';
 import 'package:word_soup/models/words_mappings.dart';
+import 'package:word_soup/utils/word_theme_generator.dart';
 
 import 'base/word_direction.dart';
 
@@ -103,7 +103,10 @@ class WordGenerator {
     var keepLooking = true;
     var word = "";
     while(keepLooking){
-      word = WordPair.random().first.toUpperCase();
+      word = WordThemeGenerator().getWords(
+          theme: mappings.theme,
+          arraySize: WordThemeGenerator.maxWords)
+          .first;
       if(!addedWords.contains(word) && word.length <= tableSize){
         for(var i = 0; i < tableSize * tableSize; i++){
           keepLooking = _checkIfCanAddWord(

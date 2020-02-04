@@ -8,6 +8,7 @@ import 'package:word_soup/models/board_data.dart';
 import 'package:word_soup/models/gameboard_state.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/overlay_widgets/close_game_dialog.dart';
+import 'package:word_soup/utils/word_theme_generator.dart';
 
 import 'game_view.dart';
 
@@ -36,7 +37,7 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
     _subscription = wordsBloc.userSelectionStream.listen((event) => updateLevel(event));
     WidgetsBinding.instance.addObserver(this);
     if(widget.boardState == null){
-      wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber);
+      wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber, level);
     }
     else{
       itemsNumber = widget.boardState.tableSize;
@@ -94,11 +95,11 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
                 ),
               ),
               Text(
-                'Player: ${widget.name}',
+                'Player: ${widget.name} - Theme: ${WordThemeGenerator.getTheme(wordsBloc.themesIntegers[level-1])}',
                 style: TextStyle(
                     color: Colors.grey.withOpacity(0.6),
                     fontWeight: FontWeight.normal,
-                    fontSize: 14
+                    fontSize: 12
                 ),
               ),
             ]
@@ -162,7 +163,7 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
       wordsBloc.cleanWordsSink();
       itemsNumber = itemsNumber == 12 ? 7 : itemsNumber+1;
       level = level == 6 ? 1 : level+1;
-      wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber);
+      wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber, level);
     });
   }
 }

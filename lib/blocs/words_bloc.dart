@@ -25,6 +25,7 @@ class WordsBloc implements Bloc {
   final wordsDirections = List<WordDirection>();
   final _userFoundWords = List<String>();
   final _userFoundWordsIndices = List<int>();
+  final themesIntegers = List<int>();
 
   var unlockWordEnable = true;
 
@@ -53,15 +54,20 @@ class WordsBloc implements Bloc {
 
   void cleanWordsSink() => _wordsSink.add(null);
 
-  Future<void> generateWords(final int tableSize, final int wordsNumber) async{
+  Future<void> generateWords(final int tableSize, final int wordsNumber, final int level) async{
     if(generating) return;
+    if(themesIntegers.isEmpty){
+      _generateThemesIntegers();
+    }
     _restartBoard(tableSize);
     for(var i = 0; i < wordsNumber; i++){
       final generator = WordGenerator(
         WordsMappings(filledIndexes: filledIndexes,
-            addedWords: addedWords,
-            wordsDirections: wordsDirections,
-            tableSize: tableSize)
+          addedWords: addedWords,
+          wordsDirections: wordsDirections,
+          tableSize: tableSize,
+          theme: themesIntegers[level-1]
+        )
       );
       final info = await generator.generateWordInfo();
       final initialPosition = info.initialPosition;
@@ -116,6 +122,9 @@ class WordsBloc implements Bloc {
     this.userName = state.userName;
     _restartBoard(state.tableSize);
     unlockWordEnable = state.unlockWordEnable;
+    if(themesIntegers.isNotEmpty)
+      themesIntegers.clear();
+    themesIntegers.addAll(state.themesIntegers);
     filledIndexes.addAll(state.filledIndexes);
     _wordIndexesString.addAll(state.wordIndexesString);
     addedWords.addAll(state.addedWords);
@@ -180,9 +189,15 @@ class WordsBloc implements Bloc {
     return List<int>();
   }
 
+  void _generateThemesIntegers(){
+    final themeList = [1,2,3,4,5,6,7]
+        ..shuffle();
+    themesIntegers.addAll(themeList);
+  }
+
   Future<void> saveGameBoardData(int level) async {
     final currentState = GameBoardState(level, tableSize, this.userName, filledIndexes, _wordIndexesString,
-        addedWords, wordsDirections,_userFoundWords, _userFoundWordsIndices, unlockWordEnable);
+        addedWords, wordsDirections,_userFoundWords, _userFoundWordsIndices, this.themesIntegers,  unlockWordEnable);
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(Constants.GAME_BOARD_STATE_KEY, jsonEncode(currentState));
   }
