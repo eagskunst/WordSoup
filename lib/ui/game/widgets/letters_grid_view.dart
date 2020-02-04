@@ -186,13 +186,12 @@ class LettersGridViewState extends State<LettersGridView> {
   }
 
   List<int> _calculateAdmittedPositions(){
-    final positions = List<int>();
     final first = indexList.first;
     final last = indexList.last;
 
-    print("First: $first, last: $last");
     final tableSize = sqrt(widget.itemCount).toInt();
     final offsetColumns = List<int>();
+
     if(last == first+tableSize || last == first-tableSize){
       for(var i = 0; i < tableSize; i++){
         offsetColumns.add(i);
@@ -206,122 +205,61 @@ class LettersGridViewState extends State<LettersGridView> {
       }
     }
 
-    positions.add(first);
     var newPos = last;
     //Normal horizontal
     if(last == first+1){
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
-      while(!offsetColumns.contains(newPos) && newPos < widget.itemCount){
-        positions.add(newPos);
-        newPos++;
-      }
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
+      return _addAdmittedPositions(first, newPos, offsetColumns, (final position) => position+1);
     }
     //Backwards horizontal
     else if(last == first-1){
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
-      while(!offsetColumns.contains(newPos) && newPos > 0){
-        positions.add(newPos);
-        newPos--;
-      }
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
+      return _addAdmittedPositions(first, newPos, offsetColumns, (final position) => position-1);
     }
 
     //Normal vertical
     else if(last == first+tableSize){
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
-      while(!offsetColumns.contains(newPos) && newPos < widget.itemCount){
-        positions.add(newPos);
-        newPos+=tableSize;
-      }
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
+      return _addAdmittedPositions(first, newPos, offsetColumns, (final position) => position+tableSize);
     }
 
 
     //Backwards vertical
     else if(last == first-tableSize){
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
-      while(!offsetColumns.contains(newPos) && newPos > 0){
-        positions.add(newPos);
-        newPos-=tableSize;
-      }
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
+      return _addAdmittedPositions(first, newPos, offsetColumns, (final position) => position-tableSize);
     }
-
 
     //Normal diagonal
     else if(last == first+tableSize+1){
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
-      while(!offsetColumns.contains(newPos) && newPos > 0 && newPos < widget.itemCount){
-        positions.add(newPos);
-        newPos+=tableSize+1;
-      }
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
+      return _addAdmittedPositions(first, newPos, offsetColumns, (final position) => position+tableSize+1);
     }
-
 
     //Backwards diagonal
     else if(last == first-tableSize-1){
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
-      while(!offsetColumns.contains(newPos) && newPos > 0){
-        positions.add(newPos);
-        newPos = newPos - tableSize- 1;
-      }
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
+      return _addAdmittedPositions(first, newPos, offsetColumns, (final position) => position-tableSize-1);
     }
 
     //Second diagonal
     else if(last == first-tableSize+1){
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
-      while(!offsetColumns.contains(newPos) && newPos > 0){
-        positions.add(newPos);
-        newPos= newPos - tableSize + 1;
-      }
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
+      return _addAdmittedPositions(first, newPos, offsetColumns, (final position) => position-tableSize+1);
     }
 
     //Second diagonal backwards
-    else if(last == first+tableSize-1){
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
-      while(!offsetColumns.contains(newPos) && newPos < widget.itemCount){
-        positions.add(newPos);
-        newPos= newPos + tableSize - 1;
-      }
-      if(offsetColumns.contains(newPos)){
-        positions.add(newPos);
-      }
+    return _addAdmittedPositions(first, newPos, offsetColumns, (final position) => position+tableSize-1);
+  }
+
+  List<int> _addAdmittedPositions(final int first, int newPos, final List<int> offsetColumns, final SumBy sumBy){
+    final positions = [first];
+
+    if(offsetColumns.contains(newPos)){
+      positions.add(newPos);
     }
 
+    while(!offsetColumns.contains(newPos) && newPos < widget.itemCount && newPos > 0){
+      positions.add(newPos);
+      newPos = sumBy(newPos);
+    }
+
+    if(offsetColumns.contains(newPos)){
+      positions.add(newPos);
+    }
     return positions;
   }
 
