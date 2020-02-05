@@ -63,6 +63,13 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
 
   @override
   Widget build(BuildContext context) {
+    final size =  MediaQuery.of(context).size;
+    Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$size'),
+          duration: Duration(minutes: 1),
+        )
+    );
     return WillPopScope(
       onWillPop: () async {
         final saveAndExit = await popNavigation();
