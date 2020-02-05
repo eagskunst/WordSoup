@@ -51,6 +51,13 @@ class _GameViewState extends State<GameView> {
 
   @override
   Widget build(BuildContext context) {
+    final size =  MediaQuery.of(context).size;
+    Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$size'),
+          duration: Duration(minutes: 1),
+        )
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
