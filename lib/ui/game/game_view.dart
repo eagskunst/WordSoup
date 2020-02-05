@@ -75,6 +75,8 @@ class _GameViewState extends State<GameView> {
 
   Widget buildGridView(){
     final boardData = BoardData.BOARD_MAP[widget.tableSize];
+    final size = MediaQuery.of(context).size;
+
     return Container(
       height: boardData.gridHeight,
       margin: EdgeInsets.all(20),
@@ -84,7 +86,7 @@ class _GameViewState extends State<GameView> {
           foundIndexes: wordsBloc.getUserFoundWordsIndices(),
           itemCount: widget.tableSize * widget.tableSize,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            childAspectRatio: 0.7,
+            childAspectRatio: size.height >= 745 ? 0.7 : 0.9,
             crossAxisCount: widget.tableSize,
             crossAxisSpacing: boardData.crossAxisSpacing,
             mainAxisSpacing: boardData.mainAxisSpacing,
