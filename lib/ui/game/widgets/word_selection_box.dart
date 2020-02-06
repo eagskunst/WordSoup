@@ -4,7 +4,7 @@ import 'package:word_soup/models/custom_fab_props.dart';
 class WordSelectionBox extends StatelessWidget {
 
   final String selection;
-  final double margin1 = 25;
+  final double margin1 = 8;
   final double margin2 = 5;
 
   const WordSelectionBox({Key key, this.selection}) : super(key: key);
@@ -13,8 +13,8 @@ class WordSelectionBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 45,
-      margin: EdgeInsets.only(left: margin1, right: margin1, top: margin2, bottom: margin2),
+      height: 50,
+      margin: EdgeInsets.all(margin1),
       decoration: BoxDecoration(
         color: CustomFabProps.COMMON_COLOR,
         borderRadius: BorderRadius.circular(5),

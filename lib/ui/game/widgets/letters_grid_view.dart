@@ -83,6 +83,8 @@ class LettersGridViewState extends State<LettersGridView> {
       child: IgnorePointer(
         ignoring: _isSelecting,
         child: GridView.builder(
+          physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
           padding: widget.padding,
           itemCount: widget.itemCount,
           itemBuilder: (BuildContext context, int index) {

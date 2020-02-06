@@ -112,7 +112,7 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
                 if(snapshot.data == null || snapshot.data.isEmpty)
                   return progressWidget();
                 else
-                  return gameColumn(snapshot);
+                  return GameView(sentence: snapshot.data, tableSize: itemsNumber, level: level);
               }
           ),
         ),
@@ -121,21 +121,6 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
   }
 
   Future<bool> popNavigation() async => await CloseGameDialog.showCloseGameDialog(context);
-
-  Widget gameColumn(AsyncSnapshot snapshot){
-    return Column(
-      children: <Widget>[
-        GameView(sentence: snapshot.data, tableSize: itemsNumber, level: level),
-        /*Container(
-          margin: EdgeInsets.only(top: 15),
-          child: FloatingActionButton(
-            child: Icon(Icons.update),
-            onPressed: () => updateLevel(SelectionEvent.LevelCompleteSelection),
-          ),
-        ) ==> this is a debug button*/
-      ],
-    );
-  }
 
   Widget progressWidget(){
     return Container(

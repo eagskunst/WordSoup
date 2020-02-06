@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc_provider/bloc_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:word_soup/blocs/words_bloc.dart';
 import 'package:word_soup/models/board_data.dart';
@@ -17,6 +18,7 @@ import 'package:word_soup/utils/overlay_widgets/words_bottom_sheet.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/custom_fabs_props_creator.dart';
 import 'package:word_soup/utils/snackbar_util.dart';
+import 'package:word_soup/utils/widgets/debug_button.dart';
 
 class GameView extends StatefulWidget {
 
@@ -51,15 +53,9 @@ class _GameViewState extends State<GameView> {
 
   @override
   Widget build(BuildContext context) {
-    final size =  MediaQuery.of(context).size;
-    Scaffold.of(context).showSnackBar(
-        SnackBar(
-          content: Text('$size'),
-          duration: Duration(minutes: 1),
-        )
-    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         buildGridView(),
         WordSelectionBox(selection: userSelection),
@@ -76,36 +72,42 @@ class _GameViewState extends State<GameView> {
                 wordsBloc.unlockWordEnable
             )
         ),
+        DebugButton(//Debug button
+          showBtn: true,
+          onPressed: () => wordsBloc.triggerLevelComplete(),
+        ),
       ],
     );
   }
 
   Widget buildGridView(){
-    final boardData = BoardData.BOARD_MAP[widget.tableSize];
     final size = MediaQuery.of(context).size;
+    final boardData = BoardData.responsiveBoardMap(size)[widget.tableSize];
 
-    return Container(
-      height: boardData.gridHeight,
-      margin: EdgeInsets.all(20),
-      child: LettersGridView(
-          onSelectionEnd: _onSelectionEnd,
-          onSelectionUpdate: _onSelectionUpdate,
-          foundIndexes: wordsBloc.getUserFoundWordsIndices(),
-          itemCount: widget.tableSize * widget.tableSize,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            childAspectRatio: size.height >= 745 ? 0.7 : 0.9,
-            crossAxisCount: widget.tableSize,
-            crossAxisSpacing: boardData.crossAxisSpacing,
-            mainAxisSpacing: boardData.mainAxisSpacing,
-          ),
-          itemBuilder: (context, index, selected){
-            return LetterBox(
-              isSelected: selected,
-              id: index,
-              letter: widget.sentence[index],
-              selectedColor: wordsBloc.getLetterColorByIndex(index),
-            );
-          }
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: AspectRatio(
+        aspectRatio: 0.99,
+        child: LettersGridView(
+            onSelectionEnd: _onSelectionEnd,
+            onSelectionUpdate: _onSelectionUpdate,
+            foundIndexes: wordsBloc.getUserFoundWordsIndices(),
+            itemCount: widget.tableSize * widget.tableSize,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              childAspectRatio: 1,
+              crossAxisCount: widget.tableSize,
+              crossAxisSpacing: boardData.crossAxisSpacing,
+              mainAxisSpacing: boardData.mainAxisSpacing,
+            ),
+            itemBuilder: (context, index, selected){
+              return LetterBox(
+                isSelected: selected,
+                id: index,
+                letter: widget.sentence[index],
+                selectedColor: wordsBloc.getLetterColorByIndex(index),
+              );
+            }
+        ),
       ),
     );
   }
