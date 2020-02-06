@@ -8,7 +8,7 @@ class GameCompleteDialog {
           builder: (context) {
             return CupertinoAlertDialog(
               title: Text(
-                "Congratulations $userName!",
+                "Felicitaciones $userName!",
                 textAlign: TextAlign.start,
                 style: TextStyle(
                     color: Color(0xff32DE8A),
@@ -19,7 +19,7 @@ class GameCompleteDialog {
               content: Padding(
                 padding: EdgeInsets.only(top: 15),
                 child: Text(
-                  "You completed all levels!",
+                  "Completaste todos los niveles!",
                   textAlign: TextAlign.start,
                   style: TextStyle(
                       color: Colors.black,
@@ -31,7 +31,7 @@ class GameCompleteDialog {
                 CupertinoDialogAction(
                   textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                   onPressed: () => Navigator.pop(context),
-                  child: Text("Close"),
+                  child: Text("Cerrar"),
                 ),
               ],
             );

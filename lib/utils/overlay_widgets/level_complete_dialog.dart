@@ -9,7 +9,7 @@ class LevelCompleteDialog {
           builder: (context) {
             return CupertinoAlertDialog(
               title: Text(
-                "Congratulations $userName!",
+                "Felicitaciones $userName!",
                 textAlign: TextAlign.start,
                 style: TextStyle(
                     color: Color(0xff32DE8A),
@@ -20,7 +20,7 @@ class LevelCompleteDialog {
               content: Padding(
                 padding: EdgeInsets.only(top: 15),
                 child: Text(
-                  "You completed level $level!",
+                  "Completaste el nivel $level!",
                   textAlign: TextAlign.start,
                   style: TextStyle(
                       color: Colors.black,
@@ -33,13 +33,13 @@ class LevelCompleteDialog {
                   textStyle:
                       TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                   onPressed: () => Navigator.pop(context, false),
-                  child: Text("Save and quit"),
+                  child: Text("Guardar y salir"),
                 ),
                 CupertinoDialogAction(
                   textStyle:
                       TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                   onPressed: () => Navigator.pop(context, true),
-                  child: Text("Next level"),
+                  child: Text("Siguiente nivel"),
                 )
               ],
             );

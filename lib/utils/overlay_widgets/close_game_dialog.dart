@@ -10,7 +10,7 @@ class CloseGameDialog {
               title: Padding(
                 padding: EdgeInsets.all(25),
                 child: Text(
-                  "Do you you want to quit the game?",
+                  "Quieres salir del juego?",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.redAccent,
@@ -24,13 +24,13 @@ class CloseGameDialog {
                   textStyle:
                   TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                   onPressed: () => Navigator.pop(context, true),
-                  child: Text("Save and quit"),
+                  child: Text("Guardar y salir"),
                 ),
                 CupertinoDialogAction(
                   textStyle:
                   TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                   onPressed: () => Navigator.pop(context, false),
-                  child: Text("Continue"),
+                  child: Text("Continuar"),
                 )
               ],
             );
