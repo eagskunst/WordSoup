@@ -32,7 +32,7 @@ class _IntroduceNameDialogState extends State<_IntroduceNameDialog> {
       title: Padding(
         padding: EdgeInsets.all(25),
         child: Text(
-          "Introduce your name: ",
+          "Ingresa tu nombre: ",
           textAlign: TextAlign.center,
           style: TextStyle(
               color: Colors.redAccent,
@@ -64,7 +64,7 @@ class _IntroduceNameDialogState extends State<_IntroduceNameDialog> {
           textStyle:
           TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
           onPressed: controller.text.isEmpty ? null : () => Navigator.pop(context, controller.text),
-          child: Text("Save"),
+          child: Text("Guardar"),
         ),
       ],
     );

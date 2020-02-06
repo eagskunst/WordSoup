@@ -62,7 +62,7 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
           ),
         ),
         CommonButton(
-          text: 'New game'.toUpperCase(),
+          text: 'Nuevo juego'.toUpperCase(),
           onTap: () async {
             final name = await IntroduceNameDialog.showInputNameDialog(context);
             if(name != null)
@@ -70,14 +70,14 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
           },
         ),
         CommonButton(
-          text: 'Continue'.toUpperCase(),
+          text: 'Continuar'.toUpperCase(),
           onTap: _gameboardState == null ? null : () => navigateToGame(context, _gameboardState, _gameboardState.userName),
         ),
         CommonButton(
-          text: 'Instructions'.toUpperCase(),
+          text: 'Instrucciones'.toUpperCase(),
         ),
         CommonButton(
-          text: 'Delete save'.toUpperCase(),
+          text: 'Borrar partida'.toUpperCase(),
           onTap: _gameboardState == null ? null : () => deleteGameBoard(),
         ),
       ],

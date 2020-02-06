@@ -88,14 +88,14 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
           middle: Column(
             children: [
               Text(
-                'Level $level',
+                'Nivel $level',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 22
                 ),
               ),
               Text(
-                'Player: ${widget.name} - Theme: ${WordThemeGenerator.getTheme(wordsBloc.themesIntegers[level-1])}',
+                'Jugador: ${widget.name} - Tema: ${WordThemeGenerator.getTheme(wordsBloc.themesIntegers[level-1])}',
                 style: TextStyle(
                     color: Colors.grey.withOpacity(0.6),
                     fontWeight: FontWeight.normal,
@@ -133,7 +133,7 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
             CircularProgressIndicator(),
             Container(
                 margin: EdgeInsets.only(top: 10),
-                child: Text('Loading')
+                child: Text('Cargando')
             )
           ],
         )
@@ -141,7 +141,7 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
   }
 
   void updateLevel(SelectionEvent event){
-    print("Update level, event: $event");
+    print("Nivel actualizado, evento: $event");
     if(event != SelectionEvent.LevelCompleteSelection) return;
     if(!mounted) return;
     setState(() {
