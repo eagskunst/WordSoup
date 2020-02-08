@@ -1,3 +1,4 @@
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:word_soup/ui/game/widgets/custom_fab_row.dart';
@@ -50,7 +51,14 @@ class _InstructionsScaffoldState extends State<InstructionsScaffold> {
                 fontWeight: FontWeight.w600
               ),
             ),
-            Container(),//Flare animation
+            AspectRatio(
+              aspectRatio: 2,
+              child: FlareActor(
+                'assets/drag_example.flr',
+                fit: BoxFit.scaleDown,
+                animation: 'Animacion',
+              ),
+            ),
             Text(
               'La palabra que formes irá apareciendo en un recuadro: ',
               textAlign: TextAlign.center,
