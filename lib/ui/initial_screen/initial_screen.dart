@@ -41,13 +41,15 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
 
   @override
   Widget build(BuildContext context) {
+    final shortestSide = MediaQuery.of(context).size.shortestSide;
+
     loadGameBoard();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         SizedBox(
-          height: 150,
+          height: shortestSide < 500 ? 150 : 190,
           child: TypewriterAnimatedTextKit(
             text: ['Word \nSearch'],
             textAlign: TextAlign.center,

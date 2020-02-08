@@ -63,6 +63,8 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
 
   @override
   Widget build(BuildContext context) {
+    final shortestSide = MediaQuery.of(context).size.shortestSide;
+
     return WillPopScope(
       onWillPop: () async {
         final saveAndExit = await popNavigation();
@@ -91,7 +93,7 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
                 'Level $level',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 22
+                    fontSize: shortestSide < 500 ? 22 : 13
                 ),
               ),
               Text(
@@ -99,7 +101,7 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
                 style: TextStyle(
                     color: Colors.grey.withOpacity(0.6),
                     fontWeight: FontWeight.normal,
-                    fontSize: 12
+                    fontSize: shortestSide < 500 ? 12 : 10
                 ),
               ),
             ]
