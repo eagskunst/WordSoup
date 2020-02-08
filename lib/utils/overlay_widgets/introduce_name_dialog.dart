@@ -61,10 +61,16 @@ class _IntroduceNameDialogState extends State<_IntroduceNameDialog> {
       ),
       actions: <Widget>[
         CupertinoDialogAction(
-          textStyle:
-          TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+          textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'MavenPro'),
+          onPressed: () => Navigator.pop(context, null),
+          child: Text("Cancelar"),
+          isDestructiveAction: true,
+        ),
+        CupertinoDialogAction(
+          textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'MavenPro'),
           onPressed: controller.text.isEmpty ? null : () => Navigator.pop(context, controller.text),
           child: Text("Guardar"),
+          isDefaultAction: true,
         ),
       ],
     );

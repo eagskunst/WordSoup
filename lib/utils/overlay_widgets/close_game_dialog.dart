@@ -22,15 +22,17 @@ class CloseGameDialog {
               actions: <Widget>[
                 CupertinoDialogAction(
                   textStyle:
-                  TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                  TextStyle(fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'MavenPro'),
                   onPressed: () => Navigator.pop(context, true),
                   child: Text("Guardar y salir"),
+                  isDestructiveAction: true,
                 ),
                 CupertinoDialogAction(
                   textStyle:
-                  TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                  TextStyle(fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'MavenPro'),
                   onPressed: () => Navigator.pop(context, false),
                   child: Text("Continuar"),
+                  isDefaultAction: true,
                 )
               ],
             );

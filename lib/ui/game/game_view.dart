@@ -121,7 +121,7 @@ class _GameViewState extends State<GameView> {
       if(wordsBloc.addedWords.contains(userSelection)){
         print("Word finded: $userSelection");
         if(wordsBloc.getUserFoundWords().contains(userSelection)){
-          SnackBarUtil.createErrorSnack(context, 'You have already found $userSelection');
+          SnackBarUtil.createErrorSnack(context, 'Ya encontraste $userSelection');
         }
         else{
           wordsBloc.addUserFoundWord(userSelection, selection);
@@ -130,13 +130,13 @@ class _GameViewState extends State<GameView> {
             else createGameCompleteDialog();
           }
           else{
-            SnackBarUtil.createSuccessSnack(context, 'You found $userSelection!');
+            SnackBarUtil.createSuccessSnack(context, 'Encontraste $userSelection!');
           }
           wordsBloc.clearUserSelection();
         }
       }
       else{
-        SnackBarUtil.createErrorSnack(context, 'Ups! That did not match a soup word');
+        SnackBarUtil.createErrorSnack(context, 'Ups! Esa palabra no esta en la sopa');
         wordsBloc.clearUserSelection();
       }
     });

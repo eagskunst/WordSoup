@@ -25,21 +25,22 @@ class LevelCompleteDialog {
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'MavenPro',
                       fontSize: 16),
                 ),
               ),
               actions: <Widget>[
                 CupertinoDialogAction(
-                  textStyle:
-                      TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                  textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'MavenPro'),
                   onPressed: () => Navigator.pop(context, false),
                   child: Text("Guardar y salir"),
+                  isDestructiveAction: true,
                 ),
                 CupertinoDialogAction(
-                  textStyle:
-                      TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                  textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'MavenPro'),
                   onPressed: () => Navigator.pop(context, true),
                   child: Text("Siguiente nivel"),
+                  isDefaultAction: true,
                 )
               ],
             );

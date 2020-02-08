@@ -24,14 +24,18 @@ class GameCompleteDialog {
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
-                      fontSize: 16),
+                      fontSize: 16,
+                      fontFamily: 'MavenPro'),
                 ),
               ),
               actions: <Widget>[
                 CupertinoDialogAction(
                   textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                   onPressed: () => Navigator.pop(context),
-                  child: Text("Cerrar"),
+                  child: Text("Cerrar",
+                  style: TextStyle(fontFamily: 'MavenPro'),
+                  ),
+                  isDestructiveAction: true,
                 ),
               ],
             );
