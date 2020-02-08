@@ -148,6 +148,7 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
       wordsBloc.cleanWordsSink();
       itemsNumber = itemsNumber == 12 ? 7 : itemsNumber+1;
       level = level == 6 ? 1 : level+1;
+      if(level == 1) wordsBloc.themesIntegers.clear();
       wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber, level);
     });
   }

@@ -9,6 +9,8 @@ class WordInfo {
 
   WordInfo({@required this.word, @required this.direction, @required this.backwards, @required this.initialPosition});
 
+  static WordInfo noWordsLeft() => WordInfo(word: null, direction: null, backwards: null, initialPosition: null);
+
   @override
   String toString() => "WordInfo(word: $word, direction: $direction, backwards: $backwards, initialPosition: $initialPosition)";
 }

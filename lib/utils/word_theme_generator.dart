@@ -55,8 +55,8 @@ class WordThemeGenerator{
     }
   }
 
-  List getWords({int theme = 1, int arraySize=16}){
-    List wordArray = [];
+  List<String> getWords({int theme = 1, int arraySize=16}){
+    List<String> wordArray = [];
     switch(theme){
       case 1:
         int i = 0;
