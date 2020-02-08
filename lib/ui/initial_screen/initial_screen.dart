@@ -8,6 +8,7 @@ import 'package:word_soup/blocs/words_bloc.dart';
 import 'package:word_soup/models/gameboard_state.dart';
 import 'package:word_soup/ui/game/game_scaffold.dart';
 import 'package:word_soup/ui/initial_screen/widgets/common_button.dart';
+import 'package:word_soup/ui/instructions/instructions_scaffold.dart';
 import 'package:word_soup/utils/constants.dart';
 import 'package:word_soup/utils/overlay_widgets/introduce_name_dialog.dart';
 
@@ -75,6 +76,9 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
         ),
         CommonButton(
           text: 'Instructions'.toUpperCase(),
+          onTap:() => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => InstructionsScaffold())
+          ),
         ),
         CommonButton(
           text: 'Delete save'.toUpperCase(),
