@@ -8,6 +8,7 @@ import 'package:word_soup/blocs/words_bloc.dart';
 import 'package:word_soup/models/gameboard_state.dart';
 import 'package:word_soup/ui/game/game_scaffold.dart';
 import 'package:word_soup/ui/initial_screen/widgets/common_button.dart';
+import 'package:word_soup/ui/instructions/instructions_scaffold.dart';
 import 'package:word_soup/utils/constants.dart';
 import 'package:word_soup/utils/overlay_widgets/introduce_name_dialog.dart';
 
@@ -40,13 +41,15 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
 
   @override
   Widget build(BuildContext context) {
+    final shortestSide = MediaQuery.of(context).size.shortestSide;
+
     loadGameBoard();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         SizedBox(
-          height: 150,
+          height: shortestSide < 500 ? 150 : 190,
           child: TypewriterAnimatedTextKit(
             text: ['Word \nSearch'],
             textAlign: TextAlign.center,
@@ -75,6 +78,9 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
         ),
         CommonButton(
           text: 'Instrucciones'.toUpperCase(),
+          onTap:() => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => InstructionsScaffold())
+          ),
         ),
         CommonButton(
           text: 'Borrar partida'.toUpperCase(),

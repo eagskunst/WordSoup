@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:word_soup/models/word_info.dart';
@@ -9,6 +10,7 @@ import 'base/word_direction.dart';
 typedef ChangePosition = int Function(int);
 
 class WordGenerator {
+  static const NO_WORDS_LEFT = "NWL";
   final WordsMappings mappings;
 
   Map<int, String> get filledIndexes => mappings.filledIndexes;
@@ -23,6 +25,9 @@ class WordGenerator {
     final direction = await _getWordDirection(random);
     final backwards = random.nextInt(2) == 1;
     final word = await _generateRandomWord(backwards, direction);
+
+    if(word == NO_WORDS_LEFT) return await _generateWithFallback(random);
+
     final initialPosition = await _generateInitialPosition(
         word: word,
         backwards: backwards,
@@ -40,12 +45,18 @@ class WordGenerator {
   }
 
   Future<WordInfo> _generateWithFallback(final Random random) async{
+    print("Generating WordInfo with fallback");
     var initialPosition = -1;
     WordInfo info;
     while(initialPosition == -1){
       final direction = await _getWordDirection(random, true);
       final backwards = random.nextInt(2) == 1;
       final word = await _generateRandomWord(backwards, direction);
+
+      if(word == NO_WORDS_LEFT){
+        return Future.value(WordInfo.noWordsLeft());
+      }
+
       initialPosition = await _generateInitialPosition(
           word: word,
           backwards: backwards,
@@ -102,11 +113,16 @@ class WordGenerator {
   Future<String> _generateRandomWord(final bool backwards, final WordDirection direction){
     var keepLooking = true;
     var word = "";
+    final wordsQueue = Queue<String>.from(WordThemeGenerator().getWords(
+        theme: mappings.theme, arraySize: WordThemeGenerator.maxWords
+    ));
     while(keepLooking){
-      word = WordThemeGenerator().getWords(
-          theme: mappings.theme,
-          arraySize: WordThemeGenerator.maxWords)
-          .first;
+
+      if(wordsQueue.isEmpty){
+        return Future.value(NO_WORDS_LEFT);
+      }
+      word = wordsQueue.removeFirst();
+
       if(!addedWords.contains(word) && word.length <= tableSize){
         for(var i = 0; i < tableSize * tableSize; i++){
           keepLooking = _checkIfCanAddWord(

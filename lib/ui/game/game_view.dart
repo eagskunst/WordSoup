@@ -65,6 +65,7 @@ class _GameViewState extends State<GameView> {
                   () => wordsBloc.clearUserSelection(),
                   () => wordsBloc.checkUserSelection(),
                   () => showModalBottomSheet(context: context,
+                    isScrollControlled: true,
                     builder: (context) => WordsBottomSheet(words: wordsBloc.createSoupWordsWidget()),
                   ),
                   () => wordsBloc.unlockWordEnable ? unlockWord() : SnackBarUtil.createErrorSnack(context, 'You have already unlocked a word')

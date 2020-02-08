@@ -64,57 +64,64 @@ class WordsBloc implements Bloc {
     if(themesIntegers.isEmpty){
       _generateThemesIntegers();
     }
-    _restartBoard(tableSize);
-    for(var i = 0; i < wordsNumber; i++){
-      final generator = WordGenerator(
-        WordsMappings(filledIndexes: filledIndexes,
-          addedWords: addedWords,
-          wordsDirections: wordsDirections,
-          tableSize: tableSize,
-          theme: themesIntegers[level-1]
-        )
-      );
-      final info = await generator.generateWordInfo();
-      final initialPosition = info.initialPosition;
-      final direction = info.direction;
-      final backwards = info.backwards;
-      final word = info.word;
-
-      var changingPos = initialPosition;
-      print("Iterator: $i, $info");
-      final buffer = StringBuffer();
-
-      switch(direction){
-        case WordDirection.Horizontal: {
-          for(var i = 0; i < word.length; i++){
-            filledIndexes[changingPos] = word[i];
-            i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
-            backwards ? changingPos -- : changingPos++;
-          }
-          break;
+    createWords: {
+      _restartBoard(tableSize);
+      for(var i = 0; i < wordsNumber; i++){
+        final generator = WordGenerator(
+            WordsMappings(filledIndexes: filledIndexes,
+                addedWords: addedWords,
+                wordsDirections: wordsDirections,
+                tableSize: tableSize,
+                theme: themesIntegers[level-1]
+            )
+        );
+        final info = await generator.generateWordInfo();
+        if(info.word == null){
+          print("The fallback generation failed. Restarting board");
+          continue createWords;
         }
-        case WordDirection.Vertical:
-          for(var i = 0; i < word.length; i++){
-            filledIndexes[changingPos] = word[i];
-            i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
-            backwards ? changingPos -=tableSize : changingPos+=tableSize;
+        final initialPosition = info.initialPosition;
+        final direction = info.direction;
+        final backwards = info.backwards;
+        final word = info.word;
+
+        var changingPos = initialPosition;
+        print("Iterator: $i, $info");
+        final buffer = StringBuffer();
+
+        switch(direction){
+          case WordDirection.Horizontal: {
+            for(var i = 0; i < word.length; i++){
+              filledIndexes[changingPos] = word[i];
+              i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
+              backwards ? changingPos -- : changingPos++;
+            }
+            break;
           }
-          break;
-        case WordDirection.Diagonal:
-          if(changingPos == -1) break;
-          for(var i = 0; i < word.length; i++){
-            filledIndexes[changingPos] = word[i];
-            i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
-            changingPos = backwards ? (changingPos - tableSize) - 1 :  (changingPos + tableSize) + 1;
-          }
-          break;
-      }
-      if(initialPosition != -1){
-        addedWords.add(word.toUpperCase());
-        wordsDirections.add(direction);
-        _wordIndexesString.add(buffer.toString());
+          case WordDirection.Vertical:
+            for(var i = 0; i < word.length; i++){
+              filledIndexes[changingPos] = word[i];
+              i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
+              backwards ? changingPos -=tableSize : changingPos+=tableSize;
+            }
+            break;
+          case WordDirection.Diagonal:
+            if(changingPos == -1) break;
+            for(var i = 0; i < word.length; i++){
+              filledIndexes[changingPos] = word[i];
+              i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
+              changingPos = backwards ? (changingPos - tableSize) - 1 :  (changingPos + tableSize) + 1;
+            }
+            break;
+        }
+        if(initialPosition != -1){
+          addedWords.add(word.toUpperCase());
+          wordsDirections.add(direction);
+          _wordIndexesString.add(buffer.toString());
+        }
       }
     }
+
     final sentence = await createSentence();
     _wordsSink.add(sentence);
     generating = false;
