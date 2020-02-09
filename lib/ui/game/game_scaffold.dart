@@ -8,14 +8,16 @@ import 'package:word_soup/models/board_data.dart';
 import 'package:word_soup/models/gameboard_state.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/overlay_widgets/close_game_dialog.dart';
+import 'package:word_soup/utils/word_theme_generator.dart';
 
 import 'game_view.dart';
 
 class GameScaffold extends StatefulWidget {
 
   final GameBoardState boardState;
+  final String name;//User's name
 
-  const GameScaffold({Key key, this.boardState}) : super(key: key);
+  const GameScaffold({Key key, this.boardState, this.name}) : super(key: key);
 
   @override
   _GameScaffoldState createState() => _GameScaffoldState();
@@ -35,13 +37,14 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
     _subscription = wordsBloc.userSelectionStream.listen((event) => updateLevel(event));
     WidgetsBinding.instance.addObserver(this);
     if(widget.boardState == null){
-      wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber);
+      wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber, level);
     }
     else{
       itemsNumber = widget.boardState.tableSize;
       level = widget.boardState.level;
       wordsBloc.generateWordsFromSavedState(widget.boardState);
     }
+    wordsBloc.userName = widget.name;
   }
 
   @override
@@ -60,6 +63,8 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
 
   @override
   Widget build(BuildContext context) {
+    final shortestSide = MediaQuery.of(context).size.shortestSide;
+
     return WillPopScope(
       onWillPop: () async {
         final saveAndExit = await popNavigation();
@@ -82,12 +87,24 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
               color: Colors.black,
             ),
           ),
-          middle: Text(
-            'Level $level',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 22
-            ),
+          middle: Column(
+            children: [
+              Text(
+                'Nivel $level',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: shortestSide < 500 ? 22 : 13
+                ),
+              ),
+              Text(
+                'Jugador: ${widget.name} - Tema: ${WordThemeGenerator.getTheme(wordsBloc.themesIntegers[level-1])}',
+                style: TextStyle(
+                    color: Colors.grey.withOpacity(0.6),
+                    fontWeight: FontWeight.normal,
+                    fontSize: shortestSide < 500 ? 12 : 10
+                ),
+              ),
+            ]
           ),
         ),
         body: SafeArea(
@@ -97,7 +114,7 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
                 if(snapshot.data == null || snapshot.data.isEmpty)
                   return progressWidget();
                 else
-                  return gameColumn(snapshot);
+                  return GameView(sentence: snapshot.data, tableSize: itemsNumber, level: level);
               }
           ),
         ),
@@ -106,21 +123,6 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
   }
 
   Future<bool> popNavigation() async => await CloseGameDialog.showCloseGameDialog(context);
-
-  Widget gameColumn(AsyncSnapshot snapshot){
-    return Column(
-      children: <Widget>[
-        GameView(sentence: snapshot.data, tableSize: itemsNumber, level: level),
-        /*Container(
-          margin: EdgeInsets.only(top: 15),
-          child: FloatingActionButton(
-            child: Icon(Icons.update),
-            onPressed: () => updateLevel(SelectionEvent.LevelCompleteSelection),
-          ),
-        ) ==> this is a debug button*/
-      ],
-    );
-  }
 
   Widget progressWidget(){
     return Container(
@@ -133,7 +135,7 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
             CircularProgressIndicator(),
             Container(
                 margin: EdgeInsets.only(top: 10),
-                child: Text('Loading')
+                child: Text('Cargando')
             )
           ],
         )
@@ -141,14 +143,15 @@ class _GameScaffoldState extends State<GameScaffold>  with WidgetsBindingObserve
   }
 
   void updateLevel(SelectionEvent event){
-    print("Update level, event: $event");
+    print("Nivel actualizado, evento: $event");
     if(event != SelectionEvent.LevelCompleteSelection) return;
     if(!mounted) return;
     setState(() {
       wordsBloc.cleanWordsSink();
       itemsNumber = itemsNumber == 12 ? 7 : itemsNumber+1;
       level = level == 6 ? 1 : level+1;
-      wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber);
+      if(level == 1) wordsBloc.themesIntegers.clear();
+      wordsBloc.generateWords(itemsNumber, BoardData.BOARD_MAP[itemsNumber].wordsNumber, level);
     });
   }
 }

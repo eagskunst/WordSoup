@@ -8,7 +8,9 @@ import 'package:word_soup/blocs/words_bloc.dart';
 import 'package:word_soup/models/gameboard_state.dart';
 import 'package:word_soup/ui/game/game_scaffold.dart';
 import 'package:word_soup/ui/initial_screen/widgets/common_button.dart';
+import 'package:word_soup/ui/instructions/instructions_scaffold.dart';
 import 'package:word_soup/utils/constants.dart';
+import 'package:word_soup/utils/overlay_widgets/introduce_name_dialog.dart';
 
 class InitialScreen extends StatefulWidget{
 
@@ -39,13 +41,15 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
 
   @override
   Widget build(BuildContext context) {
+    final shortestSide = MediaQuery.of(context).size.shortestSide;
+
     loadGameBoard();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         SizedBox(
-          height: 150,
+          height: shortestSide < 500 ? 150 : 190,
           child: TypewriterAnimatedTextKit(
             text: ['Word \nSearch'],
             textAlign: TextAlign.center,
@@ -61,31 +65,38 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
           ),
         ),
         CommonButton(
-          text: 'New game'.toUpperCase(),
-          onTap: () => navigateToGame(context, null),
+          text: 'Nuevo juego'.toUpperCase(),
+          onTap: () async {
+            final name = await IntroduceNameDialog.showInputNameDialog(context);
+            if(name != null)
+              navigateToGame(context, null, name);
+          },
         ),
         CommonButton(
-          text: 'Continue'.toUpperCase(),
-          onTap: _gameboardState == null ? null : () => navigateToGame(context, _gameboardState),
+          text: 'Continuar'.toUpperCase(),
+          onTap: _gameboardState == null ? null : () => navigateToGame(context, _gameboardState, _gameboardState.userName),
         ),
         CommonButton(
-          text: 'Instructions'.toUpperCase(),
+          text: 'Instrucciones'.toUpperCase(),
+          onTap:() => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => InstructionsScaffold())
+          ),
         ),
         CommonButton(
-          text: 'Delete save'.toUpperCase(),
+          text: 'Borrar partida'.toUpperCase(),
           onTap: _gameboardState == null ? null : () => deleteGameBoard(),
         ),
       ],
     );
   }
 
-  void navigateToGame(BuildContext context, GameBoardState gameBoardState){
+  void navigateToGame(BuildContext context, GameBoardState gameBoardState, [String name]){
     Navigator.push(
         context,
         MaterialPageRoute(builder: (context) =>
             BlocProvider<WordsBloc>(
                 creator: (_context, bag) => WordsBloc(),
-                child: GameScaffold(boardState: gameBoardState)
+                child: GameScaffold(boardState: gameBoardState, name: name)
             )
         )
     );

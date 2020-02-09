@@ -16,7 +16,7 @@ class WordsBottomSheet extends StatelessWidget{
           child: Padding(
             padding: EdgeInsets.all(25),
             child: Text(
-              'First letters of words in the board',
+              'Primeras letras de las palabras en el tablero',
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 26,

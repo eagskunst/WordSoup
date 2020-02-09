@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import 'package:flutter/foundation.dart';
+=======
+import 'dart:ui';
+>>>>>>> master
 
 class BoardData {
   final double gridHeight;
@@ -10,11 +14,22 @@ class BoardData {
   const BoardData(this.gridHeight, this.wordsNumber, this.level, [this.mainAxisSpacing = 5, this.crossAxisSpacing = 5]);
 
   static const BOARD_MAP = {
-    7: BoardData(410, 6, 1, 5, 10),
-    8: BoardData(kIsWeb ? 410 : 445, 8, 2),
-    9: BoardData(kIsWeb ? 410 : 443, 10, 3),
-    10: BoardData(kIsWeb ? 410 : 440, 12, 4),
-    11: BoardData(kIsWeb ? 410 : 437, 14, 5),
-    12: BoardData(kIsWeb ? 410 : 435, 16, 6),
+    7: BoardData(710, 6, 1, 5, 10),
+    8: BoardData(710, 8, 2),
+    9: BoardData(710, 10, 3),
+    10: BoardData(710, 12, 4),
+    11: BoardData(710, 14, 5),
+    12: BoardData(710, 16, 6),
+  };
+
+  static const double screenPercentage = .63;
+
+  static Map<int, BoardData> responsiveBoardMap(final Size size) => {
+    7: BoardData(size.height * screenPercentage, 6, 1, 5, 10),
+    8: BoardData(size.height * screenPercentage, 8, 2),
+    9: BoardData(size.height * screenPercentage, 10, 3),
+    10: BoardData(size.height * screenPercentage, 12, 4),
+    11: BoardData(size.height * screenPercentage, 14, 5),
+    12: BoardData(size.height * screenPercentage, 16, 6),
   };
 }

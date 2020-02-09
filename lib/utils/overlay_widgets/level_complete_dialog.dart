@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 
 class LevelCompleteDialog {
 
-  static Future showLevelCompleteDialog(BuildContext context, int level) =>
+  static Future showLevelCompleteDialog(BuildContext context, String userName, int level) =>
       showCupertinoDialog(
           context: context,
           builder: (context) {
             return CupertinoAlertDialog(
               title: Text(
-                "Congratulations!",
+                "Felicitaciones $userName!",
                 textAlign: TextAlign.start,
                 style: TextStyle(
                     color: Color(0xff32DE8A),
@@ -20,26 +20,27 @@ class LevelCompleteDialog {
               content: Padding(
                 padding: EdgeInsets.only(top: 15),
                 child: Text(
-                  "You completed level $level!",
+                  "Completaste el nivel $level!",
                   textAlign: TextAlign.start,
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'MavenPro',
                       fontSize: 16),
                 ),
               ),
               actions: <Widget>[
                 CupertinoDialogAction(
-                  textStyle:
-                      TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                  textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'MavenPro'),
                   onPressed: () => Navigator.pop(context, false),
-                  child: Text("Save and quit"),
+                  child: Text("Guardar y salir"),
+                  isDestructiveAction: true,
                 ),
                 CupertinoDialogAction(
-                  textStyle:
-                      TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                  textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, fontFamily: 'MavenPro'),
                   onPressed: () => Navigator.pop(context, true),
-                  child: Text("Next level"),
+                  child: Text("Siguiente nivel"),
+                  isDefaultAction: true,
                 )
               ],
             );

@@ -9,6 +9,7 @@ import 'package:word_soup/models/gameboard_state.dart';
 import 'package:word_soup/models/words_mappings.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/base/word_direction.dart';
+import 'package:word_soup/utils/color_generator.dart';
 import 'package:word_soup/utils/constants.dart';
 import 'package:word_soup/utils/widgets/soup_word.dart';
 import 'package:word_soup/utils/widgets/word_model.dart';
@@ -18,12 +19,16 @@ class WordsBloc implements Bloc {
 
   int tableSize;
   var generating = false;
+  String userName;
   final filledIndexes = Map<int, String>();
   final _wordIndexesString = List<String>();
   final addedWords = List<String>();
   final wordsDirections = List<WordDirection>();
   final _userFoundWords = List<String>();
   final _userFoundWordsIndices = List<int>();
+  final themesIntegers = List<int>();
+  final List<int> wordsColors = ColorGenerator().getColors();
+  final filledIndexesColors = Map<int, int>();
 
   var unlockWordEnable = true;
 
@@ -46,63 +51,77 @@ class WordsBloc implements Bloc {
     _userFoundWordsIndices.clear();
     _wordIndexesString.clear();
     unlockWordEnable = true;
+    filledIndexesColors.clear();
+    wordsColors.addAll(ColorGenerator().getColors());
     cleanWordsSink();
     this.tableSize = tableSize;
   }
 
   void cleanWordsSink() => _wordsSink.add(null);
 
-  Future<void> generateWords(final int tableSize, final int wordsNumber) async{
+  Future<void> generateWords(final int tableSize, final int wordsNumber, final int level) async{
     if(generating) return;
-    _restartBoard(tableSize);
-    for(var i = 0; i < wordsNumber; i++){
-      final generator = WordGenerator(
-        WordsMappings(filledIndexes: filledIndexes,
-            addedWords: addedWords,
-            wordsDirections: wordsDirections,
-            tableSize: tableSize)
-      );
-      final info = await generator.generateWordInfo();
-      final initialPosition = info.initialPosition;
-      final direction = info.direction;
-      final backwards = info.backwards;
-      final word = info.word;
-
-      var changingPos = initialPosition;
-      print("Iterator: $i, $info");
-      final buffer = StringBuffer();
-
-      switch(direction){
-        case WordDirection.Horizontal: {
-          for(var i = 0; i < word.length; i++){
-            filledIndexes[changingPos] = word[i];
-            i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
-            backwards ? changingPos -- : changingPos++;
-          }
-          break;
+    if(themesIntegers.isEmpty){
+      _generateThemesIntegers();
+    }
+    createWords: {
+      _restartBoard(tableSize);
+      for(var i = 0; i < wordsNumber; i++){
+        final generator = WordGenerator(
+            WordsMappings(filledIndexes: filledIndexes,
+                addedWords: addedWords,
+                wordsDirections: wordsDirections,
+                tableSize: tableSize,
+                theme: themesIntegers[level-1]
+            )
+        );
+        final info = await generator.generateWordInfo();
+        if(info.word == null){
+          print("The fallback generation failed. Restarting board");
+          continue createWords;
         }
-        case WordDirection.Vertical:
-          for(var i = 0; i < word.length; i++){
-            filledIndexes[changingPos] = word[i];
-            i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
-            backwards ? changingPos -=tableSize : changingPos+=tableSize;
+        final initialPosition = info.initialPosition;
+        final direction = info.direction;
+        final backwards = info.backwards;
+        final word = info.word;
+
+        var changingPos = initialPosition;
+        print("Iterator: $i, $info");
+        final buffer = StringBuffer();
+
+        switch(direction){
+          case WordDirection.Horizontal: {
+            for(var i = 0; i < word.length; i++){
+              filledIndexes[changingPos] = word[i];
+              i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
+              backwards ? changingPos -- : changingPos++;
+            }
+            break;
           }
-          break;
-        case WordDirection.Diagonal:
-          if(changingPos == -1) break;
-          for(var i = 0; i < word.length; i++){
-            filledIndexes[changingPos] = word[i];
-            i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
-            changingPos = backwards ? (changingPos - tableSize) - 1 :  (changingPos + tableSize) + 1;
-          }
-          break;
-      }
-      if(initialPosition != -1){
-        addedWords.add(word.toUpperCase());
-        wordsDirections.add(direction);
-        _wordIndexesString.add(buffer.toString());
+          case WordDirection.Vertical:
+            for(var i = 0; i < word.length; i++){
+              filledIndexes[changingPos] = word[i];
+              i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
+              backwards ? changingPos -=tableSize : changingPos+=tableSize;
+            }
+            break;
+          case WordDirection.Diagonal:
+            if(changingPos == -1) break;
+            for(var i = 0; i < word.length; i++){
+              filledIndexes[changingPos] = word[i];
+              i + 1 == word.length ? buffer.write(changingPos) : buffer.write('$changingPos-');
+              changingPos = backwards ? (changingPos - tableSize) - 1 :  (changingPos + tableSize) + 1;
+            }
+            break;
+        }
+        if(initialPosition != -1){
+          addedWords.add(word.toUpperCase());
+          wordsDirections.add(direction);
+          _wordIndexesString.add(buffer.toString());
+        }
       }
     }
+
     final sentence = await createSentence();
     _wordsSink.add(sentence);
     generating = false;
@@ -112,8 +131,16 @@ class WordsBloc implements Bloc {
     if(generating) return;
     print(state);
     generating = true;
+    this.userName = state.userName;
     _restartBoard(state.tableSize);
     unlockWordEnable = state.unlockWordEnable;
+    if(themesIntegers.isNotEmpty)
+      themesIntegers.clear();
+    themesIntegers.addAll(state.themesIntegers);
+    if(wordsColors.isNotEmpty)
+      wordsColors.clear();
+    wordsColors.addAll(state.wordsColors);
+    filledIndexesColors.addAll(state.filledIndexesColors);
     filledIndexes.addAll(state.filledIndexes);
     _wordIndexesString.addAll(state.wordIndexesString);
     addedWords.addAll(state.addedWords);
@@ -158,6 +185,10 @@ class WordsBloc implements Bloc {
   void addUserFoundWord(String word, List<int> indices) {
     _userFoundWords.add(word);
     _userFoundWordsIndices.addAll(indices);
+    for(final int index in indices){
+      filledIndexesColors[index] = wordsColors[0];
+    }
+    wordsColors.removeAt(0);
   }
 
   List<String> getUserFoundWords() => _userFoundWords.toList(growable: false);
@@ -178,9 +209,18 @@ class WordsBloc implements Bloc {
     return List<int>();
   }
 
+  void _generateThemesIntegers(){
+    final themeList = [1,2,3,4,5,6,7]
+        ..shuffle();
+    themesIntegers.addAll(themeList);
+  }
+
+  Color getLetterColorByIndex(final int index) => filledIndexesColors.containsKey(index) ? Color(filledIndexesColors[index]) : Color(wordsColors[0]);
+
   Future<void> saveGameBoardData(int level) async {
-    final currentState = GameBoardState(level, tableSize, filledIndexes, _wordIndexesString,
-        addedWords, wordsDirections,_userFoundWords, _userFoundWordsIndices, unlockWordEnable);
+    final currentState = GameBoardState(level, tableSize, this.userName, filledIndexes, _wordIndexesString,
+        addedWords, wordsDirections,_userFoundWords, _userFoundWordsIndices, this.themesIntegers, this.wordsColors,
+        this.filledIndexesColors, unlockWordEnable);
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(Constants.GAME_BOARD_STATE_KEY, jsonEncode(currentState));
   }

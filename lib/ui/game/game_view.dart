@@ -4,6 +4,7 @@ import 'package:bloc_provider/bloc_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:word_soup/blocs/words_bloc.dart';
 import 'package:word_soup/models/board_data.dart';
@@ -18,6 +19,7 @@ import 'package:word_soup/utils/overlay_widgets/words_bottom_sheet.dart';
 import 'package:word_soup/utils/base/selection_event.dart';
 import 'package:word_soup/utils/custom_fabs_props_creator.dart';
 import 'package:word_soup/utils/snackbar_util.dart';
+import 'package:word_soup/utils/widgets/debug_button.dart';
 
 class GameView extends StatefulWidget {
 
@@ -54,6 +56,7 @@ class _GameViewState extends State<GameView> {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         buildGridView(),
         WordSelectionBox(selection: userSelection),
@@ -63,6 +66,7 @@ class _GameViewState extends State<GameView> {
                   () => wordsBloc.clearUserSelection(),
                   () => wordsBloc.checkUserSelection(),
                   () => showModalBottomSheet(context: context,
+                    isScrollControlled: true,
                     builder: (context) => WordsBottomSheet(words: wordsBloc.createSoupWordsWidget()),
                   ),
                   () => wordsBloc.unlockWordEnable ? unlockWord() : SnackBarUtil.createErrorSnack(context, 'You have already unlocked a word')
@@ -70,33 +74,42 @@ class _GameViewState extends State<GameView> {
                 wordsBloc.unlockWordEnable
             )
         ),
+        DebugButton(//Debug button
+          showBtn: false,
+          onPressed: () => wordsBloc.triggerLevelComplete(),
+        ),
       ],
     );
   }
 
   Widget buildGridView(){
-    final boardData = BoardData.BOARD_MAP[widget.tableSize];
-    return Container(
-      height: boardData.gridHeight,
-      margin: kIsWeb ? EdgeInsets.symmetric(vertical: 5, horizontal: 20) : EdgeInsets.all(20),
-      child: LettersGridView(
-          onSelectionEnd: _onSelectionEnd,
-          onSelectionUpdate: _onSelectionUpdate,
-          foundIndexes: wordsBloc.getUserFoundWordsIndices(),
-          itemCount: widget.tableSize * widget.tableSize,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            childAspectRatio: kIsWeb ? 4 : 0.7,
-            crossAxisCount: widget.tableSize,
-            crossAxisSpacing: boardData.crossAxisSpacing,
-            mainAxisSpacing: boardData.mainAxisSpacing,
-          ),
-          itemBuilder: (context, index, selected){
-            return LetterBox(
-              isSelected: selected,
-              id: index,
-              letter: widget.sentence[index],
-            );
-          }
+    final size = MediaQuery.of(context).size;
+    final boardData = BoardData.responsiveBoardMap(size)[widget.tableSize];
+
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: AspectRatio(
+        aspectRatio: 0.99,
+        child: LettersGridView(
+            onSelectionEnd: _onSelectionEnd,
+            onSelectionUpdate: _onSelectionUpdate,
+            foundIndexes: wordsBloc.getUserFoundWordsIndices(),
+            itemCount: widget.tableSize * widget.tableSize,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              childAspectRatio: 1,
+              crossAxisCount: widget.tableSize,
+              crossAxisSpacing: boardData.crossAxisSpacing,
+              mainAxisSpacing: boardData.mainAxisSpacing,
+            ),
+            itemBuilder: (context, index, selected){
+              return LetterBox(
+                isSelected: selected,
+                id: index,
+                letter: widget.sentence[index],
+                selectedColor: wordsBloc.getLetterColorByIndex(index),
+              );
+            }
+        ),
       ),
     );
   }
@@ -109,7 +122,7 @@ class _GameViewState extends State<GameView> {
       if(wordsBloc.addedWords.contains(userSelection)){
         print("Word finded: $userSelection");
         if(wordsBloc.getUserFoundWords().contains(userSelection)){
-          SnackBarUtil.createErrorSnack(context, 'You have already found $userSelection');
+          SnackBarUtil.createErrorSnack(context, 'Ya encontraste $userSelection');
         }
         else{
           wordsBloc.addUserFoundWord(userSelection, selection);
@@ -118,13 +131,13 @@ class _GameViewState extends State<GameView> {
             else createGameCompleteDialog();
           }
           else{
-            SnackBarUtil.createSuccessSnack(context, 'You found $userSelection!');
+            SnackBarUtil.createSuccessSnack(context, 'Encontraste $userSelection!');
           }
           wordsBloc.clearUserSelection();
         }
       }
       else{
-        SnackBarUtil.createErrorSnack(context, 'Ups! That did not match a soup word');
+        SnackBarUtil.createErrorSnack(context, 'Ups! Esa palabra no esta en la sopa');
         wordsBloc.clearUserSelection();
       }
     });
@@ -143,12 +156,12 @@ class _GameViewState extends State<GameView> {
   }
 
   void createLevelCompletedDialog() async {
-    final goNextLevel = await LevelCompleteDialog.showLevelCompleteDialog(context, widget.level);
+    final goNextLevel = await LevelCompleteDialog.showLevelCompleteDialog(context, wordsBloc.userName, widget.level);
     if(goNextLevel) wordsBloc.triggerLevelComplete();
   }
 
   void createGameCompleteDialog() async {
-    await GameCompleteDialog.showGameCompleteDialog(context);
+    await GameCompleteDialog.showGameCompleteDialog(context, wordsBloc.userName);
     await SharedPreferences.getInstance()
       ..setString(Constants.GAME_BOARD_STATE_KEY, null);
     Navigator.pop(context);

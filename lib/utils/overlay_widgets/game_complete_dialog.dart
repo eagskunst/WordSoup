@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class GameCompleteDialog {
-  static Future showGameCompleteDialog(context) =>
+  static Future showGameCompleteDialog(context, String userName) =>
       showCupertinoDialog(
           context: context,
           builder: (context) {
             return CupertinoAlertDialog(
               title: Text(
-                "Congratulations!",
+                "Felicitaciones $userName!",
                 textAlign: TextAlign.start,
                 style: TextStyle(
                     color: Color(0xff32DE8A),
@@ -19,19 +19,23 @@ class GameCompleteDialog {
               content: Padding(
                 padding: EdgeInsets.only(top: 15),
                 child: Text(
-                  "You completed all levels!",
+                  "Completaste todos los niveles!",
                   textAlign: TextAlign.start,
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
-                      fontSize: 16),
+                      fontSize: 16,
+                      fontFamily: 'MavenPro'),
                 ),
               ),
               actions: <Widget>[
                 CupertinoDialogAction(
                   textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                   onPressed: () => Navigator.pop(context),
-                  child: Text("Close"),
+                  child: Text("Cerrar",
+                  style: TextStyle(fontFamily: 'MavenPro'),
+                  ),
+                  isDestructiveAction: true,
                 ),
               ],
             );

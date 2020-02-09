@@ -4,8 +4,10 @@ class LetterBox extends StatefulWidget {
   final int id;
   final bool isSelected;
   final String letter;
+  final Color selectedColor;
 
-  LetterBox({Key key, @required this.letter, @required this.isSelected, @required this.id}): super(key: key);
+  LetterBox({Key key, @required this.letter, @required this.isSelected,
+    @required this.id, @required this.selectedColor}): super(key: key);
 
   @override
   _LetterBoxState createState() => _LetterBoxState();
@@ -56,7 +58,7 @@ class _LetterBoxState extends State<LetterBox> with TickerProviderStateMixin {
         margin: EdgeInsets.only(left: 1, top: 1, right: 1),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
-            color: widget.isSelected ? Colors.indigo : Colors.white,
+            color: widget.isSelected ? widget.selectedColor : Colors.white,
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.7),
