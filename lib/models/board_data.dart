@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import 'package:flutter/foundation.dart';
-=======
 import 'dart:ui';
->>>>>>> master
 
 class BoardData {
   final double gridHeight;
