@@ -74,7 +74,7 @@ class _GameViewState extends State<GameView> {
             )
         ),
         DebugButton(//Debug button
-          showBtn: true,
+          showBtn: false,
           onPressed: () => wordsBloc.triggerLevelComplete(),
         ),
       ],
