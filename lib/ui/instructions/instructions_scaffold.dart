@@ -52,7 +52,7 @@ class _InstructionsScaffoldState extends State<InstructionsScaffold> {
               ),
             ),
             AspectRatio(
-              aspectRatio: 2,
+              aspectRatio: 5,
               child: FlareActor(
                 'assets/drag_example.flr',
                 fit: BoxFit.scaleDown,

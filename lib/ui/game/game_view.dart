@@ -89,14 +89,14 @@ class _GameViewState extends State<GameView> {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: AspectRatio(
-        aspectRatio: 0.99,
+        aspectRatio: 3,
         child: LettersGridView(
             onSelectionEnd: _onSelectionEnd,
             onSelectionUpdate: _onSelectionUpdate,
             foundIndexes: wordsBloc.getUserFoundWordsIndices(),
             itemCount: widget.tableSize * widget.tableSize,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 1,
+              childAspectRatio: 4,
               crossAxisCount: widget.tableSize,
               crossAxisSpacing: boardData.crossAxisSpacing,
               mainAxisSpacing: boardData.mainAxisSpacing,
