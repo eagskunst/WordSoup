@@ -47,6 +47,7 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
       children: <Widget>[
         SizedBox(
           height: shortestSide < 500 ? 150 : 190,
@@ -86,6 +87,16 @@ class _InitialScreenState extends State<InitialScreen> with WidgetsBindingObserv
           text: 'Borrar partida'.toUpperCase(),
           onTap: _gameboardState == null ? null : () => deleteGameBoard(),
         ),
+        Padding(
+          padding: const EdgeInsets.only(top: 25.0),
+          child: Text(
+            'Hecho por: Emmanuel Guerra y Carlos Rosales',
+            style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.withOpacity(0.7)
+            ),
+          ),
+        )
       ],
     );
   }

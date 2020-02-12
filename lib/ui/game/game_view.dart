@@ -68,7 +68,7 @@ class _GameViewState extends State<GameView> {
                     isScrollControlled: true,
                     builder: (context) => WordsBottomSheet(words: wordsBloc.createSoupWordsWidget()),
                   ),
-                  () => wordsBloc.unlockWordEnable ? unlockWord() : SnackBarUtil.createErrorSnack(context, 'You have already unlocked a word')
+                  () => wordsBloc.unlockWordEnable ? unlockWord() : SnackBarUtil.createErrorSnack(context, 'Ya desbloqueaste una palabra')
                 ],
                 wordsBloc.unlockWordEnable
             )
@@ -157,6 +157,13 @@ class _GameViewState extends State<GameView> {
   void createLevelCompletedDialog() async {
     final goNextLevel = await LevelCompleteDialog.showLevelCompleteDialog(context, wordsBloc.userName, widget.level);
     if(goNextLevel) wordsBloc.triggerLevelComplete();
+    else {
+      wordsBloc.triggerLevelComplete();
+      Future.delayed(Duration(milliseconds: 500))
+      .then((_) => wordsBloc.saveGameBoardData(widget.level)
+          .then((_) => Navigator.pop(context))
+      );
+    }
   }
 
   void createGameCompleteDialog() async {
